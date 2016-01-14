@@ -29,7 +29,7 @@ from doit.loader import generate_tasks
 from doit.doit_cmd import DoitMain
 from doit.cmd_base import TaskLoader
 
-import Pyro4
+from Pyro4 import naming, locateNS
 
 class CustomTaskLoader(TaskLoader):
     """create test tasks on the fly based on cmd-line arguments"""
@@ -63,7 +63,7 @@ class CustomTaskLoader(TaskLoader):
 
     def check_NS(self):
         try:
-            ns = Pyro4.locateNS()
+            ns = locateNS()
             return True
         except: return False
 
@@ -72,19 +72,7 @@ class CustomTaskLoader(TaskLoader):
         task = {}
         task['name'] = 'start_nameserver'
         task['uptodate'] = [self.check_NS]
-        task['actions'] = [(self.run_background, ['nameserver', Pyro4.naming.main], None)]
-        return task
-
-    def gentask_start_webserver(self):
-        import act3_webserver
-
-        task = {}
-        task['name'] = 'start_webserver'
-        task['task_dep'] = ['ACT3:start_nameserver']
-        #task['file_dep'] = ['%s/CMakeLists.txt'%MASHM_HOME]
-        #task['targets'] = [MASHM_HOME]
-        #task['actions'] = ['python %s/Pyro4/naming.py'%EXTERNAL_DIR]
-        task['actions'] = [(self.run_background, ['webserver', act3_webserver.start], None)]
+        task['actions'] = [(self.run_background, ['nameserver', naming.main], None)]
         return task
 
     def gentask_start_serviceDB(self):
@@ -92,7 +80,7 @@ class CustomTaskLoader(TaskLoader):
 
         task = {}
         task['name'] = 'start_serviceDB'
-        task['task_dep'] = ['ACT3:start_webserver']
+        task['task_dep'] = ['ACT3:start_nameserver']
         task['actions'] = [(self.run_background, ['svcdb', act3_svcdb.main], None)]
         return task
 
@@ -123,13 +111,25 @@ class CustomTaskLoader(TaskLoader):
         task['actions'] = [(self.run_background, ['xformer', act3_xformer.main], None)]
         return task
 
+    def gentask_start_webserver(self):
+        import act3_webserver
+
+        task = {}
+        task['name'] = 'start_webserver'
+        task['task_dep'] = ['ACT3:start_xformer']
+        #task['file_dep'] = ['%s/CMakeLists.txt'%MASHM_HOME]
+        #task['targets'] = [MASHM_HOME]
+        #task['actions'] = ['python %s/Pyro4/naming.py'%EXTERNAL_DIR]
+        task['actions'] = [(self.run_background, ['webserver', act3_webserver.start], None)]
+        return task
+
     def _gen_tasks(self):
         yield self.gentask_start_nameserver()
-        yield self.gentask_start_webserver()
         yield self.gentask_start_serviceDB()
         yield self.gentask_start_knowledgeDB()
         yield self.gentask_start_localcomp()
         yield self.gentask_start_xformer()
+        yield self.gentask_start_webserver()
 
     def load_tasks(self, cmd, params, args):
         """implements loader interface, return (tasks, config)"""
