@@ -130,9 +130,11 @@ p{
 	margin: 20px 0 0 52px;
 }
 #section3 img{
-	bottom: 0px;
+	margin: 20px 0 0 52px;
+	/*bottom: 0px;
 	position:absolute;
 	margin-left: -420px;
+	*/
 }
 .intro p{
 	width: 50%;
