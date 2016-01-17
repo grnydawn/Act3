@@ -21,9 +21,12 @@
     <script src="/static/js/act3.js"></script>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
     <script src="/static/js/jquery.easing.1.3.js"></script>
-
     <script type="text/javascript" src="/static/js/jquery.fullPage.min.js"></script>
+    <script src="/static/js/SimpleAjaxUploader.js"></script>
+
     <script type="text/javascript">
+		var nFile = 0;
+
         $(document).ready(function() {
             $('#fullpage').fullpage({
                 sectionsColor: ['#1bbc9b', '#4BBFC3', '#7BAABE', 'whitesmoke', '#ccddff'],
@@ -43,10 +46,92 @@
             $('html').click(function(){
                 $('#examplesList').hide();
             });
+
+			  
+			var btn = document.getElementById('upload-btn'),
+				  wrap = document.getElementById('pic-progress-wrap'),
+				  errBox = document.getElementById('errormsg');
+			var menu = document.getElementById('menu');
+				
+			var uploader = new ss.SimpleUpload({
+					button: btn,
+					url: '/upload',
+					sessionProgressUrl: '/upload_progress',
+					name: 'srcfile',
+					multiple: true,
+					multipart: true,
+					maxUploads: 10,
+					/*maxSize: 1024,*/
+					queue: false,
+					/*allowedExtensions: ['jpg', 'jpeg', 'png', 'gif'],*/
+					accept: '*/*',
+					debug: true,
+					hoverClass: 'btn-hover',
+					focusClass: 'active',
+					disabledClass: 'disabled',
+					responseType: 'json',
+					onSubmit: function(filename, ext) {            
+					   var prog = document.createElement('div'),
+						   outer = document.createElement('div'),
+						   bar = document.createElement('div'),
+						   size = document.createElement('div'),
+						   self = this;     
+						prog.className = 'prog';
+						size.className = 'size';
+						outer.className = 'progress progress-striped';
+						bar.className = 'progress-bar progress-bar-success';
+
+						outer.appendChild(bar);
+						prog.appendChild(size);
+						prog.appendChild(outer);
+						wrap.appendChild(prog); // 'wrap' is an element on the page
+						
+						var reset_menu = document.createElement('li'),
+							reset_url = document.createElement('a')
+						reset_url.href = "/reset"
+						reset_url.innerHTML = "Reset Session"
+						reset_menu.appendChild(reset_url)
+						menu.appendChild(reset_menu)
+
+						self.setProgressBar(bar);
+						self.setProgressContainer(prog);
+						self.setFileSizeBox(size);                
+						
+						nFile = nFile + 1
+						if (nFile == 1) {
+							errBox.innerHTML = nFile + ' file is selected.';
+						} else  {
+							errBox.innerHTML = nFile + ' files are selected.';
+						}
+						btn.src = '/static/img/btn_uploadmore.png';
+					  },		
+					  onSizeError: function() {
+							errBox.innerHTML = 'Files may not exceed 600K.';
+					  },
+					  onExtError: function() {
+						  errBox.innerHTML = 'Invalid file type. Please select a PNG, JPG, GIF image.';
+					  },
+					onComplete: function(file, response, btn) {            
+						if (!response) {
+						  errBox.innerHTML = 'Unable to upload file.';
+						}     
+						if (response.success === "true") {
+						} else {
+						  if (response.msg)  {
+							errBox.innerHTML = response.msg;
+						  } else {
+							errBox.innerHTML = 'Unable to upload file';
+						  }
+						}            
+						
+					  }
+				});
+
         });
     </script>
-
 </head>
+
+<!-- ******************** START OF BODY ********************* -->
 <body>
 <ul id="menu">
     <li data-menuanchor="firstPage" class="active"><a href="#firstPage">Home</a></li>
@@ -64,7 +149,7 @@
         <div>
 			<a href="#secondPage"><img src="/static/img/btn_try.png" alt="act3" id="btn_try" /></a>
 			&nbsp;&nbsp;&nbsp;
-			<a href="#secondPage"><img src="/static/img/btn_login.png" alt="act3" id="btn_login" /></a>
+			<a href=""><img src="/static/img/btn_disabled_login.png" alt="act3" id="btn_login" onClick="alert('Under development')"/></a>
 		</div>
     </div>
     <div class="section" id="section1">
@@ -72,17 +157,12 @@
             <div class="intro">
                 <h1>Upload Source Files</h1>
                 <h2>Begin seeing the wonder of automatic optimization.</h2>
-				<div id="status_upload">
-					<div id='msg_upload'>No file is selected.</div>
-				</div>
-				<div class="file-upload">
-					<label for="file-input">
-						<img id="btn_upload" src="/static/img/btn_upload.png"/>
-						<!-- from http://dabuttonfactory.com/ 150X50, 28pt, Bold, simple gradient from 2 to 4 at green(third column from the right) --> 
-					</label>
-					<input id="file-input" type="file" onchange="fileSelected();" multiple/>
-				</div>
             </div>
+			<div class="container">
+				<div id="errormsg" class="clearfix redtext" style="padding-top: 10px;"></div>
+				<div id="pic-progress-wrap" class="progress-wrap" style="margin-top:10px;margin-bottom:10px;"></div>
+			</div>   
+			<input type="image" src="/static/img/btn_upload.png" id="upload-btn">
         </div>
         <div class="slide">
             <div class="intro">
@@ -101,7 +181,7 @@
         <div class="slide">
             <div class="intro">
                 <h1>Download Your Optimized Program</h1>
-                <h2>Hope you find it interesting. Thank you for visiting us.</h2>
+                <h2>Hope that you find it interesting. Thank you for visiting us.</h2>
 			<a href=""><img src="/static/img/btn_download.png" alt="act3" id="btn_download" /></a>
             </div>
         </div>
@@ -110,16 +190,16 @@
         <div class="intro">
             <h1>Subscribe</h1>
             <h2>With subscription, you can unlatch all the limitations of guest service.</h2>
-			<a href=""><img src="/static/img/btn_subscribe.png" alt="act3" id="btn_subscribe" /></a>
+			<a href="#section2"><img src="/static/img/btn_disabled_subscribe.png" alt="act3" id="btn_subscribe" onClock="alert('Under development')" /></a>
         </div>
     </div>
     <div class="section" id="section3">
         <div class="intro">
             <h1>Support</h1>
             <h2>You can enjoy full support with subscription</h2>
-            <a href=""><img src="/static/img/btn_faq.png" alt="act3" id="btn_faq" /></a>
+            <a href="#section3"><img src="/static/img/btn_faq.png" alt="act3" id="btn_faq" /></a>
             &nbsp;&nbsp;&nbsp;
-            <a href=""><img src="/static/img/btn_disabled_question.png" alt="act3" id="btn_disabled_question" /></a>
+            <a href="#section3"><img src="/static/img/btn_disabled_question.png" alt="act3" id="btn_disabled_question" /></a>
         </div>
     </div>
 </div>

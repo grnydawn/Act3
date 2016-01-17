@@ -82,7 +82,7 @@ class CustomTaskLoader(TaskLoader):
 
         task = {}
         task['name'] = 'start_serviceDB'
-        task['task_dep'] = ['ACT3:start_nameserver']
+        #task['task_dep'] = ['ACT3:start_nameserver']
         task['actions'] = [(self.run_background, ['svcdb', act3_svcdb.main], None)]
         return task
 
@@ -91,7 +91,7 @@ class CustomTaskLoader(TaskLoader):
 
         task = {}
         task['name'] = 'start_knowledgeDB'
-        task['task_dep'] = ['ACT3:start_serviceDB']
+        #task['task_dep'] = ['ACT3:start_serviceDB']
         task['actions'] = [(self.run_background, ['knwdb', act3_knwdb.main], None)]
         return task
 
@@ -100,7 +100,7 @@ class CustomTaskLoader(TaskLoader):
 
         task = {}
         task['name'] = 'start_userDB'
-        task['task_dep'] = ['ACT3:start_knowledgeDB']
+        #task['task_dep'] = ['ACT3:start_knowledgeDB']
         task['actions'] = [(self.run_background, ['userdb', act3_userdb.main], None)]
         return task
 
@@ -109,7 +109,7 @@ class CustomTaskLoader(TaskLoader):
 
         task = {}
         task['name'] = 'start_localcomp'
-        task['task_dep'] = ['ACT3:start_userDB']
+        #task['task_dep'] = ['ACT3:start_userDB']
         task['actions'] = [(self.run_background, ['localcomp', act3_localcomp.main], None)]
         return task
 
@@ -118,7 +118,7 @@ class CustomTaskLoader(TaskLoader):
 
         task = {}
         task['name'] = 'start_xformer'
-        task['task_dep'] = ['ACT3:start_localcomp']
+        #task['task_dep'] = ['ACT3:start_localcomp']
         task['actions'] = [(self.run_background, ['xformer', act3_xformer.main], None)]
         return task
 
@@ -127,7 +127,7 @@ class CustomTaskLoader(TaskLoader):
 
         task = {}
         task['name'] = 'start_webserver'
-        task['task_dep'] = ['ACT3:start_xformer']
+        #task['task_dep'] = ['ACT3:start_xformer']
         #task['file_dep'] = ['%s/CMakeLists.txt'%MASHM_HOME]
         #task['targets'] = [MASHM_HOME]
         #task['actions'] = ['python %s/Pyro4/naming.py'%EXTERNAL_DIR]

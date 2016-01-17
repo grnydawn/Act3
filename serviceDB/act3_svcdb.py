@@ -8,12 +8,28 @@ EXTERNAL_DIR = ACT3_HOME + '/external'
 
 sys.path.insert(0, EXTERNAL_DIR)
 
+stage = None
+
 class A3SvcDB(object):
     def __init__(self):
         print 'SVCDB: CONNECTED'
 
     def __del__(self):
         print 'SVCDB: CLOSED'
+
+    def create_opt_session(self, session_id):
+        return {'error': False}
+
+    def reset_opt_session(self, session_id):
+        return {'error': False}
+
+    def set_opt_stage(self, session_id, stage_id):
+        global stage
+        stage = stage_id
+        return {'error': False}
+
+    def get_opt_stage(self, session_id):
+        return {'error': False, 'stage': stage}
 
 svcdb = A3SvcDB()
 
