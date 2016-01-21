@@ -3,12 +3,12 @@ import base64
 import shutil
 import cherrypy
 import Pyro4
+from act3_common import pyrocall
 
 HTML_HOME = os.path.dirname(os.path.realpath(__file__))
 SESSION_HOME = '%s/session'%HTML_HOME
 
-xformer = None
-svcdb = None
+ws_globals = {'svcdb': None, 'xformer': None}
 
 def strtohtml(line):
     #dstr = line.decode('utf-8')
@@ -42,23 +42,28 @@ class A3WebService(object):
         if 'id' not in cherrypy.session:
             cherrypy.session['id'] = self.generate_session()
             # create session on svcdb
-            res = svcdb.create_opt_session(cherrypy.session['id'])
+            res = pyrocall(ws_globals['svcdb'].create_opt_session, cherrypy.session['id'])
             if res['error']: return {'success': 'false', 'msg': 'Can not create session.'}
 
             # set current stage of the session
-            res = svcdb.set_opt_stage(cherrypy.session['id'], self.UPLOAD)
+            res = pyrocall(ws_globals['svcdb'].set_opt_stage, cherrypy.session['id'], self.UPLOAD)
             if res['error']: return {'success': 'false', 'msg': 'Can not set stage.'}
         else:
+            # set current stage of the session
+            res = pyrocall(ws_globals['svcdb'].set_opt_stage, cherrypy.session['id'], self.UPLOAD)
+            if res['error']: return {'success': 'false', 'msg': 'Can not set stage.'}
+
             # get current stage of the session
-            res = svcdb.get_opt_stage(cherrypy.session['id'])
-            if res['error']: return {'success': 'false', 'msg': 'Can not get stage.'}
+            #res = pyrocall(ws_globals['svcdb'].get_opt_stage, cherrypy.session['id'])
+            #if res['error']: return {'success': 'false', 'msg': 'Can not get stage.'}
 
             # check if file upload is valid action on current stage
-            if res.has_key('stage') and res['stage']==self.UPLOAD:
-                pass
-            else:
-                print 'BB: ', res
-                return {'success': 'false', 'msg': 'Not compatible stage'}
+            #if res.has_key('stage') and res['stage']==self.UPLOAD:
+            #    pass
+            #else:
+            #    return {'success': 'false', 'msg': 'Not compatible stage'}
+
+        retval = {'success': 'true'}
 
         if srcfile:
             filename = srcfile[0]
@@ -74,11 +79,27 @@ class A3WebService(object):
                 shutil.copyfileobj(part.file, fd)
 
                 # save information on svcdb
-                print 'XXX3: ', filepath
+                res = pyrocall(ws_globals['svcdb'].save_srcfile, cherrypy.session['id'], filepath)
+                if res['error']: return {'success': 'false', 'msg': 'Can not save fileinfo.'}
 
             # check file type async
+            res = pyrocall(ws_globals['xformer'].check_filetype, filepath)
+            if res['error']: return {'success': 'false', 'msg': 'Can not check filetype.'}
 
-        return {'success': 'true'}
+            # save filetype on svcdb
+            res = pyrocall(ws_globals['svcdb'].save_filetype, cherrypy.session['id'], filepath, res['filetype'])
+            if res['error']: return {'success': 'false', 'msg': 'Can not save filetype.'}
+
+            # get uploaded files on svcdb
+            res = pyrocall(ws_globals['svcdb'].get_uploaded_files, cherrypy.session['id'])
+            if res['error']: return {'success': 'false', 'msg': 'Can not save filetype.'}
+
+            ufiles = {}
+            for fpath, value in res['uploaded_files'].iteritems():
+                ufiles[os.path.basename(fpath)] = value['filetype']
+            retval['uploaded_files'] = ufiles
+
+        return retval
 
     @cherrypy.expose
     def reset(self):
@@ -86,7 +107,7 @@ class A3WebService(object):
             pass
             #return {'success': 'false', 'msg': 'Session does not exist.'}
         else:
-            res = svcdb.reset_opt_session(cherrypy.session['id'])
+            res = ws_globals['svcdb'].reset_opt_session(cherrypy.session['id'])
             if res['error']:
                 pass
                 #return {'success': 'false', 'msg': 'Can not reset session.'}
@@ -101,7 +122,6 @@ class A3WebService(object):
         return self.index()
 
 def start():
-    global xformer, svcdb
 
     conf = {
         '/': {
@@ -120,11 +140,11 @@ def start():
     cherrypy.tree.mount(webapp, '/', conf)
 
     ns = Pyro4.locateNS()
-    xformer = Pyro4.Proxy("PYRONAME:act3.xformer")
-    svcdb = Pyro4.Proxy("PYRONAME:act3.svcdb")
+    ws_globals['xformer'] = Pyro4.Proxy("PYRONAME:act3.xformer")
+    ws_globals['svcdb'] = Pyro4.Proxy("PYRONAME:act3.svcdb")
 
-    if xformer is None or svcdb is None:
-        Exception('Can not connect to Xformer or SvcDB')
+    if ws_globals['xformer'] is None or ws_globals['svcdb'] is None:
+        raise Exception('Can not connect to Xformer or SvcDB')
 
     cherrypy.engine.start()
     cherrypy.engine.block()

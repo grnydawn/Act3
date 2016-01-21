@@ -1,12 +1,13 @@
 import sys
 import os.path
 import signal
+from act3_task import TaskFileCheck
 
 SCRIPT_NAME = os.path.basename(__file__)
 ACT3_HOME = '%s/..'%os.path.dirname(os.path.realpath(__file__))
-EXTERNAL_DIR = ACT3_HOME + '/external'
+COMMON_DIR = ACT3_HOME + '/packages'
 
-sys.path.insert(0, EXTERNAL_DIR)
+sys.path.insert(0, COMMON_DIR)
 
 class A3XFormer(object):
     def __init__(self):
@@ -14,6 +15,19 @@ class A3XFormer(object):
 
     def __del__(self):
         print 'XFORMER: DEACTIVATED'
+
+    def check_filetype(self, filepath):
+        retval = {'error': False}
+        retval['filetype'] = 'unknown'
+
+        task1 = TaskFileCheck(filepath)
+        task1_retval = task1.perform_sync()
+
+        if task1_retval['error']:
+            pass
+        else:
+            retval['filetype'] = task1_retval['filetype']
+        return retval
 
 xformer = A3XFormer()
 

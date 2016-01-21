@@ -25,7 +25,6 @@
     <script src="/static/js/SimpleAjaxUploader.js"></script>
 
     <script type="text/javascript">
-		var nFile = 0;
 
         $(document).ready(function() {
             $('#fullpage').fullpage({
@@ -34,7 +33,9 @@
                 //anchors: ['firstPage', 'secondPage', '3rdPage', '4thpage', 'lastPage'],
                 menu: '#menu',
                 css3: true,
-                scrollingSpeed: 1000
+                scrollingSpeed: 1000,
+				//autoScrolling: false,
+				loopHorizontal: false
             });
 
             $('#showExamples').click(function(e){
@@ -86,23 +87,21 @@
 						prog.appendChild(outer);
 						wrap.appendChild(prog); // 'wrap' is an element on the page
 						
-						var reset_menu = document.createElement('li'),
-							reset_url = document.createElement('a')
-						reset_url.href = "/reset"
-						reset_url.innerHTML = "Reset Session"
-						reset_menu.appendChild(reset_url)
-						menu.appendChild(reset_menu)
+						var reset_menu =  document.getElementById('reset_element');
+						if (typeof(reset_menu) == 'undefined' || reset_menu == null)
+						{
+							var reset_menu = document.createElement('li'),
+								reset_url = document.createElement('a')
+							reset_url.id = "reset_element"
+							reset_url.href = "/reset"
+							reset_url.innerHTML = "Reset Session"
+							reset_menu.appendChild(reset_url)
+							menu.appendChild(reset_menu)
+						}
 
 						self.setProgressBar(bar);
 						self.setProgressContainer(prog);
 						self.setFileSizeBox(size);                
-						
-						nFile = nFile + 1
-						if (nFile == 1) {
-							errBox.innerHTML = nFile + ' file is selected.';
-						} else  {
-							errBox.innerHTML = nFile + ' files are selected.';
-						}
 						btn.src = '/static/img/btn_uploadmore.png';
 					  },		
 					  onSizeError: function() {
@@ -113,9 +112,22 @@
 					  },
 					onComplete: function(file, response, btn) {            
 						if (!response) {
-						  errBox.innerHTML = 'Unable to upload file.';
+							errBox.innerHTML = 'Unable to upload file.';
 						}     
-						if (response.success === "true") {
+						if (response.success == "true") {
+							var c = document.getElementById('container');
+							var key, html, nfile;
+							var height = c.offsetHeight;
+							var newHeight = height + 1;
+
+							html = '';
+							nfile = 0
+							for (key in response.uploaded_files) {
+								html = html + key + ' : ' + response.uploaded_files[key] + '<br>';
+								nfile = nfile + 1
+							} 
+							c.style.height = newHeight + 'px';
+							errBox.innerHTML = nfile + ' files are uploaded.<br><br>' + html;
 						} else {
 						  if (response.msg)  {
 							errBox.innerHTML = response.msg;
@@ -158,32 +170,46 @@
                 <h1>Upload Source Files</h1>
                 <h2>Begin seeing the wonder of automatic optimization.</h2>
             </div>
-			<div class="container">
-				<div id="errormsg" class="clearfix redtext" style="padding-top: 10px;"></div>
-				<div id="pic-progress-wrap" class="progress-wrap" style="margin-top:10px;margin-bottom:10px;"></div>
+			<br><br>
+			<div id="container" class="container">
+				<div id="errormsg">No file is selected.</div>
+				<div id="pic-progress-wrap"></div>
 			</div>   
+			<br>
 			<input type="image" src="/static/img/btn_upload.png" id="upload-btn">
         </div>
         <div class="slide">
             <div class="intro">
                 <h1>Compile and Run</h1>
                 <h2>Collect reference performance for comparison.</h2>
-			<a href=""><img src="/static/img/btn_collect.png" alt="act3" id="btn_collect" /></a>
             </div>
+			<br><br>
+			<div class="container">
+				Specify compile/run requirements including hw, sw, os, etc.
+			</div>   
+			<a href=""><img src="/static/img/btn_collect.png" alt="act3" id="btn_collect" /></a>
         </div>
         <div class="slide">
             <div class="intro">
                 <h1>Optimize</h1>
                 <h2>Please enjoy watching how much speed-ups you can get.</h2>
-			<a href=""><img src="/static/img/btn_optimize.png" alt="act3" id="btn_optimize" /></a>
             </div>
+			<br><br>
+			<div class="container">
+				Specify optimizaion requirements including target code block for optimization.
+			</div>   
+			<a href=""><img src="/static/img/btn_optimize.png" alt="act3" id="btn_optimize" /></a>
         </div>
         <div class="slide">
             <div class="intro">
                 <h1>Download Your Optimized Program</h1>
                 <h2>Hope that you find it interesting. Thank you for visiting us.</h2>
-			<a href=""><img src="/static/img/btn_download.png" alt="act3" id="btn_download" /></a>
             </div>
+			<br><br>
+			<div class="container">
+				Specify download requirements including automatic deployment or compress type.
+			</div>   
+			<a href=""><img src="/static/img/btn_download.png" alt="act3" id="btn_download" /></a>
         </div>
     </div>
     <div class="section" id="section2">

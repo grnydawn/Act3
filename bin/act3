@@ -6,7 +6,7 @@ import signal
 
 SCRIPT_NAME = os.path.basename(__file__)
 ACT3_HOME = '%s/..'%os.path.dirname(os.path.realpath(__file__))
-EXTERNAL_DIR = ACT3_HOME + '/external'
+COMMON_DIR = ACT3_HOME + '/packages'
 WEBSERVER_DIR = ACT3_HOME + '/webserver'
 SVCDB_DIR = ACT3_HOME + '/serviceDB'
 KNWDB_DIR = ACT3_HOME + '/knowledgeDB'
@@ -19,7 +19,7 @@ if sys.hexversion < 0x020700F0:
     print 'ERROR: %s works with Python Version 2.7 or later.'%SCRIPT_NAME
     sys.exit(-1)
 
-sys.path.insert(0, EXTERNAL_DIR)
+sys.path.insert(0, COMMON_DIR)
 sys.path.insert(1, SVCDB_DIR)
 sys.path.insert(2, KNWDB_DIR)
 sys.path.insert(3, USERDB_DIR)
@@ -130,7 +130,7 @@ class CustomTaskLoader(TaskLoader):
         #task['task_dep'] = ['ACT3:start_xformer']
         #task['file_dep'] = ['%s/CMakeLists.txt'%MASHM_HOME]
         #task['targets'] = [MASHM_HOME]
-        #task['actions'] = ['python %s/Pyro4/naming.py'%EXTERNAL_DIR]
+        #task['actions'] = ['python %s/Pyro4/naming.py'%COMMON_DIR]
         task['actions'] = [(self.run_background, ['webserver', act3_webserver.start], None)]
         return task
 

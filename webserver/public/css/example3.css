@@ -530,16 +530,11 @@ p{
 /* Additional CSS
  * --------------------------------------- */
 
-.file-upload > input
-{
-    display: none;
-}
-
 .container {
 	margin: auto;
     border-radius: 20px;
     border: 2px solid #3d85c6; /*#73AD21;*/
     padding: 10px; 
     width: 600px;
-    height: 100px; 
+    height: 30px; 
 }

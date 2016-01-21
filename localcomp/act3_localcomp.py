@@ -4,9 +4,9 @@ import signal
 
 SCRIPT_NAME = os.path.basename(__file__)
 ACT3_HOME = '%s/..'%os.path.dirname(os.path.realpath(__file__))
-EXTERNAL_DIR = ACT3_HOME + '/external'
+COMMON_DIR = ACT3_HOME + '/packages'
 
-sys.path.insert(0, EXTERNAL_DIR)
+sys.path.insert(0, COMMON_DIR)
 
 class A3LocalComp(object):
     def __init__(self):
