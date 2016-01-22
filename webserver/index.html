@@ -35,7 +35,14 @@
                 css3: true,
                 scrollingSpeed: 1000,
 				//autoScrolling: false,
-				loopHorizontal: false
+				controlArrows: true,
+				loopHorizontal: false,
+				afterSlideLoad (anchorLink, index, slideAnchor, slideIndex) {
+					var loadedSlide = $(this);
+					$('div.fp-controlArrow.fp-prev').hide()
+					$('div.fp-controlArrow.fp-next').hide()
+					//No file is selected.
+				}
             });
 
             $('#showExamples').click(function(e){
@@ -115,9 +122,9 @@
 							errBox.innerHTML = 'Unable to upload file.';
 						}     
 						if (response.success == "true") {
-							var c = document.getElementById('container');
+							var c1 = document.getElementById('container1');
 							var key, html, nfile;
-							var height = c.offsetHeight;
+							var height = c1.offsetHeight;
 							var newHeight = height + 1;
 
 							html = '';
@@ -126,8 +133,11 @@
 								html = html + key + ' : ' + response.uploaded_files[key] + '<br>';
 								nfile = nfile + 1
 							} 
-							c.style.height = newHeight + 'px';
+							c1.style.height = newHeight + 'px';
 							errBox.innerHTML = nfile + ' files are uploaded.<br><br>' + html;
+							$('div.fp-controlArrow.fp-next').show()
+							document.getElementById('build_os').disabled = false;
+							document.getElementById('build_command').disabled = false;
 						} else {
 						  if (response.msg)  {
 							errBox.innerHTML = response.msg;
@@ -140,6 +150,24 @@
 				});
 
         });
+
+		function check_input_bldcmd() {
+			var x = document.getElementById("btn_collect");
+			x.src = "/static/img/btn_collect.png";
+		};
+
+		function compile_run() {
+			var os = document.getElementById("build_os");
+			var cmd = document.getElementById("build_command");
+			var os_text = os.options[ os.selectedIndex ].text
+			var cmd_text = cmd.value
+			$.post('collect', { os: os_text, cmd : cmd_text}, 
+				function(returnedData){
+					 //console.log(returnedData);
+					 alert(returnedData)
+			});
+		};
+
     </script>
 </head>
 
@@ -171,7 +199,7 @@
                 <h2>Begin seeing the wonder of automatic optimization.</h2>
             </div>
 			<br><br>
-			<div id="container" class="container">
+			<div id="container1" class="container">
 				<div id="errormsg">No file is selected.</div>
 				<div id="pic-progress-wrap"></div>
 			</div>   
@@ -184,10 +212,14 @@
                 <h2>Collect reference performance for comparison.</h2>
             </div>
 			<br><br>
-			<div class="container">
-				Specify compile/run requirements including hw, sw, os, etc.
+			<div id="container2" class="container">
+				OS:&nbsp;
+				<select id='build_os' disabled>
+					<option>Linux on Docker</option>
+				</select><br>
+				Build command:&nbsp;<input type='text' id='build_command' width=800 height=50 onChange="check_input_bldcmd()" disabled>
 			</div>   
-			<a href=""><img src="/static/img/btn_collect.png" alt="act3" id="btn_collect" /></a>
+			<img src="/static/img/btn_disabled_collect.png" alt="act3" id="btn_collect" onclick="compile_run()"/>
         </div>
         <div class="slide">
             <div class="intro">
@@ -195,7 +227,7 @@
                 <h2>Please enjoy watching how much speed-ups you can get.</h2>
             </div>
 			<br><br>
-			<div class="container">
+			<div id="container3" class="container">
 				Specify optimizaion requirements including target code block for optimization.
 			</div>   
 			<a href=""><img src="/static/img/btn_optimize.png" alt="act3" id="btn_optimize" /></a>
@@ -206,7 +238,7 @@
                 <h2>Hope that you find it interesting. Thank you for visiting us.</h2>
             </div>
 			<br><br>
-			<div class="container">
+			<div id="container4" class="container">
 				Specify download requirements including automatic deployment or compress type.
 			</div>   
 			<a href=""><img src="/static/img/btn_download.png" alt="act3" id="btn_download" /></a>

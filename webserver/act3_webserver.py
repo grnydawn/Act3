@@ -37,6 +37,14 @@ class A3WebService(object):
 
     @cherrypy.expose
     @cherrypy.tools.json_out()
+    def collect(self, os=None, cmd=None):
+        retval = {'success': 'true'}
+
+        print 'TTTTTTTTTTTTTTT: ', os, cmd
+        return retval
+
+    @cherrypy.expose
+    @cherrypy.tools.json_out()
     def upload(self, srcfile=None):
 
         if 'id' not in cherrypy.session:
