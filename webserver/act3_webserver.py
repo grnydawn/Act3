@@ -6,9 +6,9 @@ import Pyro4
 from act3_common import pyrocall
 
 HTML_HOME = os.path.dirname(os.path.realpath(__file__))
-SESSION_HOME = '%s/session'%HTML_HOME
+WS_SESSION_HOME = '%s/session'%HTML_HOME
 
-ws_globals = {'svcdb': None, 'xformer': None}
+ws_globals = {'svcdb': None, 'xformer': None, 'localcomp': None}
 
 def strtohtml(line):
     #dstr = line.decode('utf-8')
@@ -37,10 +37,24 @@ class A3WebService(object):
 
     @cherrypy.expose
     @cherrypy.tools.json_out()
-    def collect(self, os=None, cmd=None):
-        retval = {'success': 'true'}
+    def collect(self, os_text=None, build_text=None, run_text=None):
+        retval = {'success': 'false'}
 
-        print 'TTTTTTTTTTTTTTT: ', os, cmd
+        # check os_text, build_text, and run_text
+        if any( item is None for item in [os_text, build_text, run_text]):
+            return retval
+
+        order_flags = '--build_cmd "%s" --run_cmd "%s"'%(build_text, run_text)
+        session_dir = '%s/%s'%(WS_SESSION_HOME, cherrypy.session['id'])
+        # order work 
+        res = pyrocall(ws_globals['localcomp'].run, cherrypy.session['id'], 'ref_timing', \
+            session_dir, os_text, order_flags)
+        if res['error']: return {'success': 'false', 'msg': 'Can not order work.'}
+
+        retval['stdout'] = res['stdout']
+        retval['stderr'] = res['stderr']
+        retval['success'] = 'true'
+
         return retval
 
     @cherrypy.expose
@@ -77,7 +91,7 @@ class A3WebService(object):
             filename = srcfile[0]
             part = srcfile[1]
             
-            session_dir = '%s/%s'%(SESSION_HOME, cherrypy.session['id'])
+            session_dir = '%s/%s'%(WS_SESSION_HOME, cherrypy.session['id'])
             if not os.path.exists(session_dir):
                 os.makedirs(session_dir)
         
@@ -122,8 +136,8 @@ class A3WebService(object):
             else:
                 pass
 
-            print SESSION_HOME, cherrypy.session['id']
-            session_dir = '%s/%s'%(SESSION_HOME, cherrypy.session['id'])
+            print WS_SESSION_HOME, cherrypy.session['id']
+            session_dir = '%s/%s'%(WS_SESSION_HOME, cherrypy.session['id'])
             if os.path.exists(session_dir):
                 shutil.rmtree(session_dir)
 
@@ -150,9 +164,12 @@ def start():
     ns = Pyro4.locateNS()
     ws_globals['xformer'] = Pyro4.Proxy("PYRONAME:act3.xformer")
     ws_globals['svcdb'] = Pyro4.Proxy("PYRONAME:act3.svcdb")
+    ws_globals['localcomp'] = Pyro4.Proxy("PYRONAME:act3.localcomp")
 
-    if ws_globals['xformer'] is None or ws_globals['svcdb'] is None:
-        raise Exception('Can not connect to Xformer or SvcDB')
+    if ws_globals['xformer'] is None or \
+        ws_globals['svcdb'] is None or \
+        ws_globals['localcomp'] is None:
+        raise Exception('Can not connect to Xformer or SvcDB or LocalComp')
 
     cherrypy.engine.start()
     cherrypy.engine.block()

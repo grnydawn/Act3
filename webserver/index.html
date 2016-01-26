@@ -138,6 +138,7 @@
 							$('div.fp-controlArrow.fp-next').show()
 							document.getElementById('build_os').disabled = false;
 							document.getElementById('build_command').disabled = false;
+							document.getElementById('run_command').disabled = false;
 						} else {
 						  if (response.msg)  {
 							errBox.innerHTML = response.msg;
@@ -155,16 +156,22 @@
 			var x = document.getElementById("btn_collect");
 			x.src = "/static/img/btn_collect.png";
 		};
+		function check_input_runcmd() {
+			var x = document.getElementById("btn_collect");
+			x.src = "/static/img/btn_collect.png";
+		};
 
 		function compile_run() {
 			var os = document.getElementById("build_os");
-			var cmd = document.getElementById("build_command");
+			var build_cmd = document.getElementById("build_command");
+			var run_cmd = document.getElementById("run_command");
 			var os_text = os.options[ os.selectedIndex ].text
-			var cmd_text = cmd.value
-			$.post('collect', { os: os_text, cmd : cmd_text}, 
+			var build_text = build_cmd.value
+			var run_text = run_cmd.value
+			$.post('collect', { os_text: os_text, build_text : build_text, run_text : run_text}, 
 				function(returnedData){
-					 //console.log(returnedData);
-					 alert(returnedData)
+					 console.log(returnedData);
+					 //alert(returnedData)
 			});
 		};
 
@@ -212,12 +219,13 @@
                 <h2>Collect reference performance for comparison.</h2>
             </div>
 			<br><br>
-			<div id="container2" class="container">
+			<div id="container2" class="container2">
 				OS:&nbsp;
 				<select id='build_os' disabled>
 					<option>Linux on Docker</option>
 				</select><br>
-				Build command:&nbsp;<input type='text' id='build_command' width=800 height=50 onChange="check_input_bldcmd()" disabled>
+				Build command:&nbsp;<input type='text' id='build_command' width="200px" onChange="check_input_bldcmd()" disabled><br>
+				Run command:&nbsp;<input type='text' id='run_command' width="200px" onChange="check_input_runcmd()" disabled>
 			</div>   
 			<img src="/static/img/btn_disabled_collect.png" alt="act3" id="btn_collect" onclick="compile_run()"/>
         </div>

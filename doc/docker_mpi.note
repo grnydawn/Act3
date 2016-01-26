@@ -1,0 +1,162 @@
+Voted:2
+  ↑ Vote
+Developing Message Passing Application (MPI) With Docker
+
+wangzhiming | Dec 12 2014 | Tags:  docker mpi cluster hpc developing | 4,942 Views
+Author: Zhi Ming Wang
+
+ 
+
+Message Passing Interface (MPI) is a standardized and portable message-passing system designed by a group of researchers from academia and industry to function on a wide variety of parallel computers. It is a de facto standard of a parallel software industry, and encouraged development of portable and scalable large-scale parallel applications.
+
+ 
+
+Docker is a platform for developers, QA and sysadmins to develop, ship, and run applications. Docker provides a way to run almost any application securely isolated in a container. The isolation and security allow you to run many containers simultaneously on your host.
+
+ 
+
+Normally, a cluster environment is necessary for developing MPI applications. It is expensive to get and maintain for developers. In this, I will discuss about how to make a cluster environment ready for parallel computing in single node with Docker. It is easy to deploy. It is simple to distribute the environment to your teams for further development and testing, too.
+
+ 
+
+Here are the steps: (In the example, the CentOS 7.0 was installed at host machine. )
+
+ 
+
+1) First install Docker in your host
+
+Docker is included by default in the CentOS-Extras repository in CentOS 7. To install, you just need to simply run the following command.
+
+$ sudo yum install -y docker
+
+ 
+
+Once Docker is installed, you need to start the docker daemon.
+
+$ sudo service docker start
+
+ 
+
+2) Get images and run it
+
+ 
+
+First, we'll need to get the latest OS image using command "docker pull". In example, I get the CentOS images.
+
+         $ sudo docker pull centos
+
+ 
+
+Next, we can list the images:
+
+         $ sudo docker images
+
+REPOSITORY          TAG                   IMAGE ID            CREATED             VIRTUAL SIZE
+
+centos              centos5               192178b11d36        5 weeks ago         466.9 MB
+
+centos              centos6               70441cac1ed5        5 weeks ago         215.8 MB
+
+centos              centos7               ae0c2d0bdc10        5 weeks ago         224 MB
+
+ 
+
+All the images of centos5, centos6 and centos7 are installed.
+
+ 
+
+Finally, run a simple bash shell to test the image. The “REPOSITORY:TAG” is used to select one image.
+
+$ sudo docker run -i -t centos:centos6 /bin/bash
+
+ 
+
+3) create Docker containers from those Docker images to run your applications
+
+ 
+
+For developing MPI application, there are few necessary packages for building the program, such as C/Fortran compiler, debugger and so on. Let us start a bash shell in the contanter for installing the packages.  The default installation is mini in Docker, there are some system tools that needed to be installed for program developing. In example, "vhost" is the host name of container/
+
+ 
+
+         $ sudo docker run -i -t centos:centos6 -h vhost /bin/bash
+
+                   [vhost] $ yum install which tar –y
+
+                   [vhost] $ yum install openssh-client openssh-server -y
+
+                  [vhost] $ yum install gcc gdb –y
+
+                   [vhost] $ yum install glibc.i686 libgcc.i686 –y  (The libs are needed by IBM Platform MPI)
+
+ 
+
+Next, you should install a MPI implementation. IBM Platform MPI Community Edition was used in the example. You can download it at http://www.ibm.com/developerworks/downloads/im/mpi/index.html
+
+The package of IBM Platform MPI is “platform_mpi-09.01.02.00u.x64.bin”. The installation is very easy.
+
+                   [vhost] $ ./platform_mpi-09.01.02.00u.x64.bin
+
+                                     “accept the agreement”
+
+                                     “Choose Install Folder”
+
+                                     “Installing...”
+
+                                     “Installation Complete”
+
+                                  
+
+ 
+
+Finally, you should create a new image from the container's changes.
+
+         $  sudo docker ps  (Get the CONTAINER ID)
+
+CONTAINER ID        IMAGE                COMMAND                CREATED             STATUS              PORTS                   NAMES
+
+8ccb781e2bcb        centos:centos6       "/bin/bash"            43 minutes ago      Up 43 minutes                               evil_stallman
+
+         $ sudo docker commit 8ccb781e2bcb centos:mpi
+
+ 
+
+3) Deploy a cluster from the images to develop MPI applications.
+
+Using a line command, we can get a ready virtual machine with Docker.
+
+         $ sudo docker run -d -h node01 --name cont01 centos:mpi /usr/sbin/sshd –D
+
+After the container was up, you can get the IP address of container using “docker inspect”.
+
+         $ sudo docker inspect -f "{{ .NetworkSettings.IPAddress }}" cont01
+
+For creating more nodes, you just need to run the above two commands more times, just changing the name of host and container. Also, you can add the two lines into a shell script for more custom operations.
+
+ 
+
+The last work is that setting auto ssh login without password. There is a page named “IBM Platform-MPI and LSF SSH Environment Setup” about it. Following the guide, you can set it by self. The paper is simple and useful.
+
+ 
+
+4) Build and run the MPI applications
+
+Now, it is time to build our MPI applications. The “Hello World” is used for the example.
+
+         $ export MPI_ROOT=/opt/ibm/platform_mpi/
+
+         $ $MPI_ROOT/bin/mpicc hello_world.c -o hello_world
+
+         $ $MPI_ROOT/bin/mpirun -np 4 -hostlist node01,node02,node03,node04 ./hello_world
+
+node02: Hello world from rank 1 of 4
+
+node03: Hello world from rank 2 of 4
+
+node01: Hello world from rank 0 of 4
+
+node04: Hello world from rank 3 of 4
+
+ 
+
+Following the steps, we should be able to quick deploy a virtual cluster and develop our MPI applications on it.

@@ -1,0 +1,16 @@
+# build an image using Dockerfile.
+docker build -t act3_worker:gfortran_4.8.4 .
+
+# Remove all dangling images.
+docker rmi $(docker images -f "dangling=true" -q)
+
+# Remove all stopped containers.
+docker rm $(docker ps -a -q)
+
+# Run a docker image
+docker run -i -t act3_worker:gfortran_4.8.4 /bin/bash
+docker run -i -t -v /home/youngsung/repos/github/Act3/localcomp/home:/home act3_worker:gfortran_4.8.4 /bin/bash
+docker run -i -t -v /home/youngsung/repos/github/Act3/localcomp/home:/home act3_worker:gfortran_4.8.4 python /home/do.py
+
+# Inspect a docker image
+docker inspect act3_worker:gfortran_4.8.4
