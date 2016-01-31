@@ -36,6 +36,9 @@ def main():
         try:
             from a3web_index import A3Index
             index = A3Index()
+
+            cherrypy.config.update({'server.socket_host': '0.0.0.0'})
+
             cherrypy.tree.mount(index, '/', index.conf)            
 
             cherrypy.engine.start()
