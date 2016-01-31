@@ -14,3 +14,7 @@ docker run -i -t -v /home/youngsung/repos/github/Act3/localcomp/home:/home act3_
 
 # Inspect a docker image
 docker inspect act3_worker:gfortran_4.8.4
+
+# Find out ip address of docker-machine on Windows
+docker-machine ls
+docker-machine ip <machinename>
