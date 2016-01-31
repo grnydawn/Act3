@@ -8,20 +8,33 @@ import traceback
 #                  ACT3 Components                 #
 ####################################################
 
-a3common = \
+common = \
 {
-    'services': [ 'a3web' ],
-    'a3web':
-    {
-        'desc': 'Act3 WebServer',
-        'pyroname': 'PYRONAME:act3.a3web',
+    'services': [ 'sdb', 'kdb', 'udb', 'comp', 'xform', 'web' ],
+    'sdb': {
+        'desc': 'Act3 Service DB',
+        'pyroname': 'PYRONAME:act3.sdb',
     },
-    'xformer':
-    {
+    'kdb': {
+        'desc': 'Act3 Knowledge DB',
+        'pyroname': 'PYRONAME:act3.kdb',
+    },
+    'udb': {
+        'desc': 'Act3 User DB',
+        'pyroname': 'PYRONAME:act3.udb',
+    },
+    'comp': {
+        'desc': 'Act3 Computing Resource',
+        'pyroname': 'PYRONAME:act3.comp',
+    },
+    'xform': {
         'desc': 'Act3 Transformer',
-        'pyroname': 'PYRONAME:act3.xformer',
+        'pyroname': 'PYRONAME:act3.xform',
     },
-
+    'web': {
+        'desc': 'Act3 WebServer',
+        'pyroname': 'PYRONAME:act3.web',
+    }
 }
 
 ####################################################
@@ -43,8 +56,8 @@ class A3P_Exception(A3_Exception):
 #                     Logging                      #
 ####################################################
 
-def get_a3logger(a3name, filename, level):
-    logger = logging.getLogger(a3name.upper())
+def get_logger(svcname, filename, level):
+    logger = logging.getLogger(svcname.upper())
     logger.setLevel(level)
 
     # create console handler and set level to debug
@@ -70,15 +83,15 @@ def get_a3logger(a3name, filename, level):
 #                      Params                      #
 ####################################################
 
-a3params_desc = {}
+params_desc = {}
 
-def register_params(a3name, params_desc):
-    a3params_desc[a3name] = params_desc
+def register_params(svcname, svcdesc):
+    params_desc[svcname] = svcdesc
 
-def get_cmdline_params(a3name):
+def get_cmdline_params(svcname):
 
-    parser = argparse.ArgumentParser(description=a3common[a3name]['desc'])
-    for pname, (pdefault, pdesc, pmap) in a3params_desc[a3name].items():
+    parser = argparse.ArgumentParser(description=common[svcname]['desc'])
+    for pname, (pdefault, pdesc, pmap) in params_desc[svcname].items():
         parser.add_argument('--%s'%pname, dest=pname.replace('-', '_'), type=str,
         default=pdefault, help='%s (default: %s)'%(pdesc, pdefault))
 
@@ -90,15 +103,15 @@ def get_cmdline_params(a3name):
 
     return cparams
 
-def get_params(a3name):
+def get_params(svcname):
     params = {}
 
     # default params
-    default_params = {key: value[0] for (key, value) in a3params_desc[a3name].items()}
+    default_params = {key: value[0] for (key, value) in params_desc[svcname].items()}
     params.update(default_params)
 
     # read command line arguments
-    cmdline_params = get_cmdline_params(a3name)
+    cmdline_params = get_cmdline_params(svcname)
     params.update(cmdline_params)
 
     # params from json file

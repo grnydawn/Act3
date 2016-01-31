@@ -4,7 +4,7 @@ import cherrypy
 
 from a3web_utils import SCRIPT_DIR
 
-class A3Index(object):
+class A3Reset(object):
     def __init__(self):
         self.conf = \
         {
