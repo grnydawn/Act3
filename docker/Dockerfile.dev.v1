@@ -1,0 +1,6 @@
+FROM grnydawn/act3_base:v1
+MAINTAINER Youngsung Kim<grnydawn@gmail.com>
+RUN apt-get install -y git
+WORKDIR /root
+COPY ./entrypoint.sh /root
+ENTRYPOINT ["/bin/bash", "./entrypoint.sh"]

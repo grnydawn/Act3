@@ -1,0 +1,10 @@
+FROM ubuntu:14.04
+MAINTAINER Youngsung Kim<grnydawn@gmail.com>
+WORKDIR /root
+RUN apt-get update
+RUN apt-get install -y wget
+RUN apt-get install -y build-essential gfortran-4.8
+RUN wget https://bootstrap.pypa.io/get-pip.py
+RUN python3 get-pip.py
+RUN python3 -m pip install cherrypy==4.0.0
+RUN python3 -m pip install Pyro4==4.41

@@ -1,0 +1,9 @@
+FROM grnydawn/act3_base:v1
+MAINTAINER Youngsung Kim<grnydawn@gmail.com>
+RUN apt-get install -y unzip
+WORKDIR /root
+RUN wget https://github.com/grnydawn/Act3/archive/master.zip
+RUN unzip master.zip
+WORKDIR /root/Act3/bin
+ENTRYPOINT ["python", "./start.py"]
+CMD ["all"]
