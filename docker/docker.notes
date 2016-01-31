@@ -1,5 +1,8 @@
 # build an image using Dockerfile.
 docker build -t act3_worker:gfortran_4.8.4 .
+docker build -f ./Dockerfile.base.v1 -t grnydawn/act3_base:v1 .
+docker build -f ./Dockerfile.dev.v1 -t grnydawn/act3_dev:v1 .
+docker build -f ./Dockerfile.dist.v1 -t grnydawn/act3_dist:v1 .
 
 # Remove all dangling images.
 docker rmi $(docker images -f "dangling=true" -q)
@@ -11,6 +14,10 @@ docker rm $(docker ps -a -q)
 docker run -i -t act3_worker:gfortran_4.8.4 /bin/bash
 docker run -i -t -v /home/youngsung/repos/github/Act3/localcomp/home:/home act3_worker:gfortran_4.8.4 /bin/bash
 docker run -i -t -v /home/youngsung/repos/github/Act3/localcomp/home:/home act3_worker:gfortran_4.8.4 python /home/do.py
+docker run -it -P grnydawn/act3_dev:v1 ys
+docker run -it -P -v ~/temp:/root/shared grnydawn/act3_dev:v1 ys
+docker run -it -p 8080:8080 -v ~/temp:/root/shared grnydawn/act3_dev:v1 ys
+docker run -it -P --entrypoint=/bin/bash grnydawn/act3_dev:v1 ys
 
 # Inspect a docker image
 docker inspect act3_worker:gfortran_4.8.4
@@ -18,3 +25,11 @@ docker inspect act3_worker:gfortran_4.8.4
 # Find out ip address of docker-machine on Windows
 docker-machine ls
 docker-machine ip <machinename>
+
+# attached to an existing process
+docker attach f23014c45d8c
+docker attach act3
+
+# attache to a new shell process
+docker exec -it 665b4a1e17b6 bash
+docker exec -it act3 bash
