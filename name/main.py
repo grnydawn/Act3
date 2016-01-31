@@ -1,3 +1,4 @@
+import sys
 from Pyro4 import naming, locateNS
 
 if __name__ == "__main__":
@@ -10,6 +11,5 @@ if __name__ == "__main__":
             else: args.append(arg)
     try:
         ns = locateNS()
-        
     except:
         sys.exit(naming.main())
