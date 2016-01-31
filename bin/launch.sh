@@ -28,5 +28,5 @@ for cmd in "${cmds[@]}"; do
     fi
 done
 
-#echo ${pids[@]}  
-#wait ${pids[@]}
+##echo ${pids[@]}  
+##wait ${pids[@]}
