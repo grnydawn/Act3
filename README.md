@@ -36,7 +36,7 @@ Instructions for Development
 
 4. Visit Act3 Home page using browser
 
-    4.1 Find IP address to access(Linux)
+    4.1 Find IP address to access
     
         LINUX HOST >> ifconfig docker0 | grep "inet addr"
         
