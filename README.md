@@ -24,7 +24,7 @@ Instructions for Development
 
 2. Run the image with a proper branch name on this Act3 Github repo. 
 
-	```HOST >> docker docker run -it -P grnydawn/act3_dev:v1 [branch]```
+	```HOST >> docker run -it -P grnydawn/act3_dev:v1 [branch]```
 
 
 3. Launch Act3 Components
