@@ -51,7 +51,7 @@ Instructions for Development
 
     5.1 Find Container ID
     
-	HOST >> docker ps
+	```HOST >> docker ps```
 	
     5.2 Create a terminal
     
