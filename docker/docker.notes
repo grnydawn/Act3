@@ -10,6 +10,15 @@ docker rmi $(docker images -f "dangling=true" -q)
 # Remove all stopped containers.
 docker rm $(docker ps -a -q)
 
+# Create a docker container
+docker create --name act3dev -h act3dev -it -p 8080:8080 -p 9090:9090 -v ~/temp:/root/shared grnydawn/act3_dev:v2 ys
+
+# Start a docker container
+docker start -ai act3dev
+
+# Commit a new docker image
+docker commit -m "Modified entrypoint.sh to check if Act3 folder exists." act3dev  grnydawn/act3_dev:v2
+
 # Run a docker image
 docker run -i -t act3_worker:gfortran_4.8.4 /bin/bash
 docker run -i -t -v /home/youngsung/repos/github/Act3/localcomp/home:/home act3_worker:gfortran_4.8.4 /bin/bash
@@ -26,10 +35,16 @@ docker inspect act3_worker:gfortran_4.8.4
 docker-machine ls
 docker-machine ip <machinename>
 
+# Remove a docker container
+docker rm act3dev
+
+# Remove all docker containers
+docker rm $(docker ps -a -q)
+
 # attached to an existing process
 docker attach f23014c45d8c
-docker attach act3
+docker attach act3dev
 
 # attache to a new shell process
 docker exec -it 665b4a1e17b6 bash
-docker exec -it act3 bash
+docker exec -it act3dev bash
