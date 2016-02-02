@@ -1,11 +1,12 @@
 #!/bin/bash
 
+name=act3dev
 opts=("${*:2:$#}")
 
-docker create --name act3dev -h act3dev -it -p 8080:8080 -p 9090:9090 $opts grnydawn/act3_dev:v2 $1
+docker create --name $name -h $name -it -p 8080:8080 -p 9090:9090 $opts grnydawn/act3_dev:v2 $1
 
-if [ "$?" == 0 ]; then
-    echo "act3dev Docker container is successfully created."
+if [ $? -eq 0 ]; then
+    echo "$name Docker container is successfully created."
 else
-    echo "act3dev Docker container is NOT correctly created."
+    echo "$name Docker container is NOT correctly created."
 fi

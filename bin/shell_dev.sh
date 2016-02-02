@@ -7,4 +7,4 @@ else
     opts=("${*:2:$#}")
 fi
 
-docker start -ai $opts $1
+docker exec -it $opts $container bash
