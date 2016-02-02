@@ -1,45 +1,52 @@
 # a3_utils.py
 
+import os
 import argparse
 import logging
 import traceback
+
+ACT3_HOME = '%s/..'%os.path.dirname(os.path.realpath(__file__))
 
 ####################################################
 #                  ACT3 Components                 #
 ####################################################
 
-common = \
+common_params = \
 {
     'services': [ 'sdb', 'kdb', 'udb', 'comp', 'xform', 'web' ],
+    'host': {
+        'shared': '/root/shared'
+    },
     'name': {
         'desc': 'Act3 Name Server',
-        'pyroname': ' PYRO:Pyro.NameServer',
+        'pyroname': 'Pyro.NameServer',
         'search_interval': 0.1, # in sec
         'search_maxtries': 100,
+        'path': '%s/name'%ACT3_HOME,
     },
     'sdb': {
         'desc': 'Act3 Service DB',
-        'pyroname': 'PYRONAME:act3.sdb',
+        'path': '%s/sdb'%ACT3_HOME,
     },
     'kdb': {
         'desc': 'Act3 Knowledge DB',
-        'pyroname': 'PYRONAME:act3.kdb',
+        'path': '%s/kdb'%ACT3_HOME,
     },
     'udb': {
         'desc': 'Act3 User DB',
-        'pyroname': 'PYRONAME:act3.udb',
+        'path': '%s/udb'%ACT3_HOME,
     },
     'comp': {
         'desc': 'Act3 Computing Resource',
-        'pyroname': 'PYRONAME:act3.comp',
+        'path': '%s/comp'%ACT3_HOME,
     },
     'xform': {
         'desc': 'Act3 Transformer',
-        'pyroname': 'PYRONAME:act3.xform',
+        'path': '%s/xform'%ACT3_HOME,
     },
     'web': {
         'desc': 'Act3 WebServer',
-        'pyroname': 'PYRONAME:act3.web',
+        'path': '%s/web'%ACT3_HOME,
     }
 }
 
@@ -62,7 +69,7 @@ class A3P_Exception(A3_Exception):
 #                     Logging                      #
 ####################################################
 
-def get_logger(svcname, filename, level):
+def create_logger(svcname, filename, level):
     logger = logging.getLogger(svcname.upper())
     logger.setLevel(level)
 
@@ -89,15 +96,10 @@ def get_logger(svcname, filename, level):
 #                      Params                      #
 ####################################################
 
-params_desc = {}
+def get_cmdline_params(svcname, svcdesc):
 
-def register_params(svcname, svcdesc):
-    params_desc[svcname] = svcdesc
-
-def get_cmdline_params(svcname):
-
-    parser = argparse.ArgumentParser(description=common[svcname]['desc'])
-    for pname, (pdefault, pdesc, pmap) in params_desc[svcname].items():
+    parser = argparse.ArgumentParser(description=common_params[svcname]['desc'])
+    for pname, (pdefault, pdesc, pmap) in svcdesc.items():
         parser.add_argument('--%s'%pname, dest=pname.replace('-', '_'), type=str,
         default=pdefault, help='%s (default: %s)'%(pdesc, pdefault))
 
@@ -109,28 +111,50 @@ def get_cmdline_params(svcname):
 
     return cparams
 
-def get_params(svcname):
+def setup_params(svcname, svcdesc):
     params = {}
 
     # default params
-    default_params = {key: value[0] for (key, value) in params_desc[svcname].items()}
+    default_params = {key: value[0] for (key, value) in svcdesc.items()}
     params.update(default_params)
 
     # read command line arguments
-    cmdline_params = get_cmdline_params(svcname)
+    cmdline_params = get_cmdline_params(svcname, svcdesc)
     params.update(cmdline_params)
 
     # params from json file
     try:
-        with open('%s/%s'%(params['host-shared'], params['json-config']), 'r') as f:
+        with open('%s/%s'%(common_params['svcname']['path'], params['json-config']), 'r') as f:
             json_params = json.load(f)
             params.update(json_params)
     except: pass
 
-    # update from command line arguments
+    # overwrite by command line arguments
     params.update(cmdline_params)
 
     return params
+
+def _get_param(ppath, params):
+    try:
+        for pname in ppath.split(':'):
+            params = params[pname]
+        return params
+    except: return None
+
+def _set_param(ppath, pvalue, params):
+    try:
+        psplit = ppath.split(':')
+        nsplit = len(psplit)
+        if nsplit==1:
+            params[ppath] = pvalue
+            return pvalue
+        elif nsplit>1:
+            for pname in psplit[:(nsplit-1)]:
+                params = params[pname]
+            if params is not None:
+                params[psplit[-1]] = pvalue
+            return pvalue
+    except: return None
 
 ####################################################
 #                       Pyro                       #
@@ -154,10 +178,4 @@ def runcmd(cmd, input=None):
     proc = subprocess.Popen(cmd, stdin=subprocess.PIPE, \
         stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     return proc.communicate(input=input)
-
-    try:
-        with open('%s/%s'%(SCRIPT_DIR, A3WEB_JSON), 'r') as f:
-            json_params = json.load(f)
-            params.update(json_params)
-    except: pass
 

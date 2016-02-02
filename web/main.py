@@ -1,20 +1,26 @@
 # web/main.py
 
+import os
 import sys
 import time
+
+ACT3_HOME = '%s/..'%os.path.dirname(os.path.realpath(__file__))
+COMMON_DIR = ACT3_HOME + '/common'
+if COMMON_DIR not in sys.path:
+    sys.path.insert(0, COMMON_DIR)
+
 from a3web_utils import web_initialize, web_finalize, get_param, set_param, \
-    get_param_desc, logger
+    logger
 
 def find_svc(svcnames):
     if not isinstance(svcnames, list) or len(svcnames)==0 or \
         svcnames[0]=='web': return
 
     try:
-        svcpyroname = get_param('%s:pyroname'%svcnames[0], paramtype='common')
-        svc = Pyro4.Proxy(svcpyroname)
-        set_param('pyro-%s-object'%svcnames[0], svc, paramtype='runtime')
+        svc = Pyro4.Proxy('PYRONAME:%s'%svcnames[0])
+        set_param('pyro-%s-object'%svcnames[0], svc)
     except:
-        set_param('pyro-%s-object'%svcnames[0], None, paramtype='runtime')
+        set_param('pyro-%s-object'%svcnames[0], None)
         logger().info('Pyro %s object is not found.'%svcnames[0])
 
     find_svc(svcnames[1:])
@@ -30,16 +36,16 @@ def main():
     try:
         import Pyro4
         ns = None
-        for i in range(get_param('name:search_maxtries', paramtype='common')):
+        for i in range(get_param('name:search_maxtries')):
             try:
                 ns = Pyro4.locateNS()
-                set_param('pyro-name-object', ns, paramtype='runtime')
+                set_param('pyro-name-object', ns)
                 logger().info('Connected to a Pyro name server.')
                 break
             except:
-                time.sleep(get_param('name:search_interval', paramtype='common'))
+                time.sleep(get_param('name:search_interval'))
         if ns:
-            find_svc(get_param('services', paramtype='common'))
+            find_svc(get_param('services'))
         else:
             logger().info('Can not connect to a Pyro name server.')
     except ImportError as e:

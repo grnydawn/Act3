@@ -10,16 +10,17 @@ A3_HOME = '%s/..'%SCRIPT_DIR
 A3_COMMON = '%s/common'%A3_HOME
 sys.path.insert(0, A3_COMMON)
 
-from a3_utils
+from a3_utils import common_params, setup_params, create_logger, _get_param, _set_param
 
 # session stage
 class A3WebSession(object):
     (UPLOAD, ) = range(1)
 
 # web server configuration parameters
-web_params_desc = \
+# ( value, descritpion, value mapping )
+user_params_desc = \
     {
-        'host-shared': ('/root', 'A folder in the container shared with host', None),
+        'web-session-dir': ('%s/web/sessions'%common_params['host']['shared'], 'A folder in the container for saving session-related files', None),
         'json-config': ('web.json', 'A JSON file for Act3 Webserver configuration', None),
         'log-level': ('debug', 'Logging level for  Act3 Webserver',
             {
@@ -34,7 +35,7 @@ web_params_desc = \
     }
 
 # web server runtime parameters
-web_default_runtime = \
+runtime_params = \
 {
     'pyro-name-object': None,
     'pyro-sdb-object': None,
@@ -42,68 +43,69 @@ web_default_runtime = \
     'pyro-udb-object': None,
     'pyro-comp-object': None,
     'pyro-xform-object': None,
-    'pyro-web-object': None
+    'pyro-web-object': None,
+    'logger': None,
 }
 
 # web parameter database
 web_globals = {}
-web_globals['params'] = {}
-web_globals['params_desc'] = web_params_desc
-web_globals['runtime'] = web_default_runtime
-web_globals['common'] = a3_utils.common
-web_globals['logger'] =  None
+web_globals['user_params'] = {}
+web_globals['user_params_desc'] = user_params_desc
+web_globals['runtime_params'] = runtime_params
 
 def web_initialize():
 
-    a3_utils.register_params('web', web_globals['params_desc'])
+    params = setup_params('web', web_globals['user_params_desc'])
+    web_globals['user_params'] = params
 
-    params = a3_utils.get_params('web')
-    web_globals['params'] = params
+    logger = create_logger('web', '%s/%s'%(common_params['host']['shared'], \
+        params['log-filename']), web_globals['user_params_desc']['log-level'][2][params['log-level']])
+    web_globals['runtime_params']['logger'] = logger
 
-    logger = a3_utils.get_logger('web', '%s/%s'%(params['host-shared'], params['log-filename']), \
-        web_globals['params_desc']['log-level'][2][params['log-level']])
-    web_globals['logger'] = logger
+    # TODO: check if there is dupulication in parameters among runtime, user, and common
+
+    if not os.path.exists(params['web-session-dir']):
+        os.makedirs(params['web-session-dir'])
 
     logger.info('Started')
 
 def web_finalize():
     logger().info('Finished')
 
-def get_param(ppath, paramtype='params'):
-    try:
-        pitem = web_globals[paramtype]
-        for pname in ppath.split(':'):
-            pitem = pitem[pname]
-        return pitem
-    except: return None
+def get_param(ppath, params='ruc'):
+    value = None
+    for param in params:
+        if param=='r':
+            value = _get_param(ppath, web_globals['runtime_params'])
+        elif param=='u':
+            value = _get_param(ppath, web_globals['user_params'])
+        elif param=='c':
+            value = _get_param(ppath, common_params)
+        if value: break
+    return value 
 
-def set_param(ppath, pvalue, paramtype='params'):
-    try:
-        pdict = web_globals[paramtype]
-        psplit = ppath.split(':')
-        nsplit = len(psplit)
-        if nsplit==1:
-            pdict[ppath] = pvalue
-            return pvalue
-        elif nsplit>1:
-            for pname in psplit[:(nsplit-1)]:
-                pdict = pdict[pname]
-            if pdict is not None:
-                pdict[psplit[-1]] = pvalue
-            return pvalue
-    except: return None
+def set_param(ppath, pvalue, params='ruc'):
+    # TODO: make sure that there is no dupulication in parameters
 
-def get_param_desc(pname):
+    value = None
+    for param in params:
+        if param=='r':
+            value = _set_param(ppath, pvalue, web_globals['runtime_params'])
+        elif param=='u':
+            value = _set_param(ppath, pvalue, web_globals['user_params'])
+        elif param=='c':
+            value = _set_param(ppath, pvalue, common_params)
+        if value: break
+    return value 
+
+def get_user_param_desc(pname):
     try:
-        return web_globals['params_desc'][pname]
+        return web_globals['user_params_desc'][pname]
     except: return None
 
 def logger():
-    return web_globals['logger']
+    return web_globals['runtime_params']['logger']
 
 def generate_session():
     return base64.b64encode(os.urandom(16), '._')
 
-def pyrocall(*args, **kwargs):
-    return a3_utils.pyrocall(*args, **kwargs)
-    
