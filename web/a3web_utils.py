@@ -10,8 +10,7 @@ A3_HOME = '%s/..'%SCRIPT_DIR
 A3_COMMON = '%s/common'%A3_HOME
 sys.path.insert(0, A3_COMMON)
 
-from a3_utils import register_params, get_params, get_logger, common, pyrocall
-
+from a3_utils
 
 # session stage
 class A3WebSession(object):
@@ -51,17 +50,17 @@ web_globals = {}
 web_globals['params'] = {}
 web_globals['params_desc'] = web_params_desc
 web_globals['runtime'] = web_default_runtime
-web_globals['common'] = common
+web_globals['common'] = a3_utils.common
 web_globals['logger'] =  None
 
 def web_initialize():
 
-    register_params('web', web_globals['params_desc'])
+    a3_utils.register_params('web', web_globals['params_desc'])
 
-    params = get_params('web')
+    params = a3_utils.get_params('web')
     web_globals['params'] = params
 
-    logger = get_logger('web', '%s/%s'%(params['host-shared'], params['log-filename']), \
+    logger = a3_utils.get_logger('web', '%s/%s'%(params['host-shared'], params['log-filename']), \
         web_globals['params_desc']['log-level'][2][params['log-level']])
     web_globals['logger'] = logger
 
@@ -105,3 +104,6 @@ def logger():
 def generate_session():
     return base64.b64encode(os.urandom(16), '._')
 
+def pyrocall(*args, **kwargs):
+    return a3_utils.pyrocall(*args, **kwargs)
+    
