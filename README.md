@@ -24,7 +24,7 @@ Instructions for Development
 
 2. Create "act3dev" container with a proper branch name found on this Act3 Github repo. 
 
-	```HOST >> docker create --name act3dev -h act3dev -it -p 8080:8080 -p 9090:9090 $opts grnydawn/act3_dev:v2  [branch]```
+	```HOST >> docker create --name act3dev -h act3dev -it -p 8080:8080 -p 9090:9090 grnydawn/act3_dev:v2  [branch]```
 
 	NOTE: This command is also implemented in Act3/bin/create_dev.sh.
 
