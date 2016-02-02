@@ -29,5 +29,5 @@ for cmd in "${cmds[@]}"; do
     fi
 done
 
-echo ${pids[@]} > .pids
+echo ${pids[@]} > $DIR/.pids
 ##wait ${pids[@]}
