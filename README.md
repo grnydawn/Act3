@@ -19,15 +19,24 @@ Instructions for Development
 
 1. Download Act3 Development Image from Docker Hub.
 
-        HOST >> docker pull grnydawn/act3_dev:v1
+        HOST >> docker pull grnydawn/act3_dev:v2
 
 
-2. Run the image with a proper branch name on this Act3 Github repo. 
+2. Create "act3dev" container with a proper branch name found on this Act3 Github repo. 
 
-	```HOST >> docker run -it -P grnydawn/act3_dev:v1 [branch]```
+	```HOST >> docker create --name act3dev -h act3dev -it -p 8080:8080 -p 9090:9090 grnydawn/act3_dev:v2  [branch]```
+
+	NOTE: This command is also implemented in Act3/bin/create_dev.sh.
 
 
-3. Launch Act3 Components
+2. Start the "act3dev" container. 
+
+	```HOST >> docker start -ai act3dev```
+
+	NOTE: This command is also implemented in Act3/bin/start_dev.sh.
+	
+	
+3. Launch Act3 Components in the container.
 
 	```CONTAINER >> cd /root/Act3/bin```
 	
@@ -40,7 +49,7 @@ Instructions for Development
     
         LINUX HOST >> ifconfig docker0 | grep "inet addr"
         
-        WINDOWS HOST >> docker-machine ls or docker-machine ip [virtualmachinename]
+        WINDOWS HOST >> docker-machine ip default
         
     4.2 Access Act3 Home page
    
@@ -48,14 +57,8 @@ Instructions for Development
 
 
 5. Create a terminal to work on files in CONTAINER
-
-    5.1 Find Container ID
     
-	```HOST >> docker ps```
-	
-    5.2 Create a terminal
-    
-        HOST >> docker exec -it [Container ID] bash
+        HOST >> docker exec -it act3dev bash
 
 
 6. Modify files and push to Github Act3 repo.
