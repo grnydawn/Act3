@@ -10,7 +10,12 @@ A3_HOME = '%s/..'%SCRIPT_DIR
 A3_COMMON = '%s/common'%A3_HOME
 sys.path.insert(0, A3_COMMON)
 
-from a3_utils import register_params, get_params, get_logger, common
+from a3_utils import register_params, get_params, get_logger, common, pyrocall
+
+
+# session stage
+class A3WebSession(object):
+    (UPLOAD, ) = range(1)
 
 # web server configuration parameters
 web_params_desc = \

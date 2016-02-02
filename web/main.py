@@ -55,9 +55,9 @@ def main():
             index = A3Index()
             cherrypy.tree.mount(index, '/', index.conf)            
 
-            from a3web_reset import A3Reset
-            reset = A3Reset()
-            cherrypy.tree.mount(reset, '/reset', reset.conf)            
+            from a3web_upload import A3Upload
+            upload = A3Upload()
+            cherrypy.tree.mount(upload, '/upload', upload.conf)            
 
             cherrypy.engine.start()
             logger().info('Act3 Web server is started.')

@@ -21,6 +21,6 @@ class A3Index(object):
         }
 
     @cherrypy.expose
-    def index(self):
+    def index(self, op='home'):
         with open('%s/index.html'%SCRIPT_DIR, 'r') as fd:
             return fd.read()
