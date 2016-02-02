@@ -65,14 +65,28 @@ def web_initialize():
 def web_finalize():
     logger().info('Finished')
 
-def get_param(pname, paramtype='params'):
-    try: return web_globals[paramtype][pname]
+def get_param(ppath, paramtype='params'):
+    try:
+        pitem = web_globals[paramtype]
+        for pname in ppath.split(':'):
+            pitem = pitem[pname]
+        return pitem
     except: return None
 
-def set_param(pname, pvalue, paramtype='params'):
+def set_param(ppath, pvalue, paramtype='params'):
     try:
-        web_globals[paramtype][pname] = pvalue
-        return web_globals[paramtype][pname]
+        pdict = web_globals[paramtype]
+        psplit = ppath.split(':')
+        nsplit = len(psplit)
+        if nsplit==1:
+            pdict[ppath] = pvalue
+            return pvalue
+        elif nsplit>1:
+            for pname in psplit[:(nsplit-1)]:
+                pdict = pdict[pname]
+            if pdict is not None:
+                pdict[psplit[-1]] = pvalue
+            return pvalue
     except: return None
 
 def get_param_desc(pname):

@@ -1,6 +1,7 @@
 # web/main.py
 
 import sys
+import time
 from a3web_utils import web_initialize, web_finalize, get_param, set_param, \
     get_param_desc, logger
 
@@ -29,14 +30,18 @@ def main():
     try:
         import Pyro4
         ns = None
-        try:
-            ns = Pyro4.locateNS()
-            set_param('pyro-name-object', ns, paramtype='runtime')
-            logger().info('Connected to a Pyro name server.')
-        except:
-            logger().info('Can not connect to a Pyro name server.')
+        for i in range(get_param('name:search_maxtries', paramtype='common')):
+            try:
+                ns = Pyro4.locateNS()
+                set_param('pyro-name-object', ns, paramtype='runtime')
+                logger().info('Connected to a Pyro name server.')
+                break
+            except:
+                time.sleep(get_param('name:search_interval', paramtype='common'))
         if ns:
             find_svc(get_param('services', paramtype='common'))
+        else:
+            logger().info('Can not connect to a Pyro name server.')
     except ImportError as e:
         logger().warn('Pyro module is not loaded.')
  

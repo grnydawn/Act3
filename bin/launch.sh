@@ -23,10 +23,11 @@ done
 for cmd in "${cmds[@]}"; do
     if [ -f "${DIR}/../${cmd}/main.py" ]; then
         python3 ${DIR}/../${cmd}/main.py &
-        pids+=("$!")
-        sleep 3
+		if [ "$?" == "0" ]; then
+			pids+=("$!")
+		fi
     fi
 done
 
-##echo ${pids[@]}  
+echo ${pids[@]} > .pids
 ##wait ${pids[@]}

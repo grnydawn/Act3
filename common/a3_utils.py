@@ -11,6 +11,12 @@ import traceback
 common = \
 {
     'services': [ 'sdb', 'kdb', 'udb', 'comp', 'xform', 'web' ],
+    'name': {
+        'desc': 'Act3 Name Server',
+        'pyroname': ' PYRO:Pyro.NameServer',
+        'search_interval': 0.1, # in sec
+        'search_maxtries': 100,
+    },
     'sdb': {
         'desc': 'Act3 Service DB',
         'pyroname': 'PYRONAME:act3.sdb',

@@ -11,5 +11,6 @@ if __name__ == "__main__":
             else: args.append(arg)
     try:
         ns = locateNS()
+        sys.exit(-1)
     except:
         sys.exit(naming.main())

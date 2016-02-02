@@ -1,0 +1,13 @@
+FROM grnydawn/act3_base:v1
+MAINTAINER Youngsung Kim<grnydawn@gmail.com>
+RUN apt-get install -y git
+RUN apt-get install -y vim
+RUN git config --global user.name "Youngsung Kim"
+RUN git config --global user.email grnydawn@gmail.com
+WORKDIR /root
+EXPOSE 8080 9090
+COPY ./entrypoint.sh /root
+COPY ./.vimrc /root
+RUN mkdir /root/shared
+VOLUME /root/shared
+ENTRYPOINT ["/bin/bash", "./entrypoint.sh"]
