@@ -160,17 +160,6 @@ def _set_param(ppath, pvalue, params):
 #                       Pyro                       #
 ####################################################
 
-def pyrocall(func, *args, **kwargs):
-    try: import Pyro4.util
-    except: raise A3P_Exception('Could not find Pyro module.')
-
-    try:
-        return func(*args, **kwargs)
-    except Exception as e:
-        tb = traceback.format_exc()
-        pyrotb = "".join(Pyro4.util.getPyroTraceback())
-        raise A3P_Exception('%s/\n*********** PYRO Exception ***********\n%s'%(tb, pyrotb))
-
 ####################################################
 #                      Shell                       #
 ####################################################

@@ -3,14 +3,15 @@
 import sys
 import os
 import logging
-import base64
+import random
+import traceback
 
 SCRIPT_DIR, SCRIPT_NAME = os.path.split(os.path.realpath(__file__))
 A3_HOME = '%s/..'%SCRIPT_DIR
 A3_COMMON = '%s/common'%A3_HOME
 sys.path.insert(0, A3_COMMON)
 
-from a3_utils import common_params, setup_params, create_logger, _get_param, _set_param
+from a3_utils import common_params, setup_params, create_logger, _get_param
 
 # session stage
 class A3WebSession(object):
@@ -107,5 +108,32 @@ def logger():
     return web_globals['runtime_params']['logger']
 
 def generate_session():
-    return base64.b64encode(os.urandom(16), '._')
+    return 'A3'+'%030x' % random.randrange(16**30)
 
+def pyrocall(destname, funcname, *args, **kwargs):
+
+    try:
+        import Pyro4
+    except:
+        return {'error': True, 'msg': 'Can not import Pyro4 module.'}
+
+    destobj = runtime_params['pyro-%s-object'%destname] 
+    if not destobj:
+        try:
+            destobj = Pyro4.Proxy('PYRONAME:%s'%destname)
+        except:
+            return {'error': True, 'msg': 'Can not get %s Pyro object'%destname}
+        if destobj:
+            runtime_params['pyro-%s-object'%destname] = destobj
+
+    if destobj:
+        try:
+            funcobj = getattr(destobj, funcname)
+            return funcobj(*args, **kwargs)
+        except Exception as e:
+            #tb = traceback.format_exc()
+            #pyrotb = "".join(Pyro4.util.getPyroTraceback())
+            #print('%s/\n*********** PYRO Exception ***********\n%s'%(tb, pyrotb))
+            return {'error': True, 'msg': 'Call to Pyro function, %s.%s, is failed'%(destname, funcname)}
+    else:
+        return {'error': True, 'msg': 'Pyro object, %s, is None.'%destname}

@@ -10,7 +10,6 @@ A3_HOME = '%s/..'%SCRIPT_DIR
 A3_COMMON = '%s/common'%A3_HOME
 sys.path.insert(0, A3_COMMON)
 
-from a3sdb_pyro import A3SdbPyroIF
 from a3_utils import common_params, setup_params, create_logger, _get_param, _set_param
 
 # session stage
@@ -35,7 +34,6 @@ user_params_desc = \
 runtime_params = \
 {
     'pyro-name-object': None,
-    'pyro-sdb-object': A3SdbPyroIF(),
     'pyro-kdb-object': None,
     'pyro-udb-object': None,
     'pyro-comp-object': None,

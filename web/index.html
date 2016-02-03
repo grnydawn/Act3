@@ -63,7 +63,7 @@
 				
 			var uploader = new ss.SimpleUpload({
 					button: btn,
-					url: '/upload',
+					url: '/upload/',
 					sessionProgressUrl: '/upload_progress',
 					name: 'srcfile',
 					multiple: true,
@@ -100,7 +100,7 @@
 							var reset_menu = document.createElement('li'),
 								reset_url = document.createElement('a')
 							reset_url.id = "reset_element"
-							reset_url.href = "/?op=reset"
+							reset_url.href = "/"
 							reset_url.innerHTML = "Reset Session"
 							reset_menu.appendChild(reset_url)
 							menu.appendChild(reset_menu)
