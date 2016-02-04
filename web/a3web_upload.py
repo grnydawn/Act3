@@ -4,7 +4,8 @@ import os
 import shutil
 import cherrypy
 
-from a3web_utils import SCRIPT_DIR, generate_session, A3WebSession, get_param, pyrocall
+from a3web_utils import SCRIPT_DIR, generate_session, A3WebSession, get_param, pyrocall, \
+    logger
 
 class A3Upload(object):
     def __init__(self):

@@ -25,14 +25,14 @@ def main():
             cherrypy.tree.mount(upload, '/upload', upload.conf)            
 
             cherrypy.engine.start()
-            logger().info('Act3 Web server is started.')
+            logger().info('Act3 Web server is started')
 
             cherrypy.engine.block()
         except Exception as e:
             logger().error('Page generator is not loaded: %s'%str(e))
             retval = -1
     except ImportError as e:
-        logger().error('cherrypy module is not loaded.')
+        logger().error('cherrypy module is not loaded')
         retval = -1
 
     # finalize web

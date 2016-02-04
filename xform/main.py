@@ -1,24 +1,24 @@
-# sdb/main.py
+# xform/main.py
 
 import sys
 import time
 
-from a3sdb_utils import sdb_initialize, sdb_finalize, get_param, set_param, logger
-from a3sdb_pyro import A3SdbPyroIF
+from a3xform_utils import xform_initialize, xform_finalize, get_param, set_param, logger
+from a3xform_pyro import A3SdbPyroIF
 
 def main():
 
     retval = 0
 
-    # initialize sdb
-    sdb_initialize()
+    # initialize xform
+    xform_initialize()
 
     # locate Pyro name server
     try:
         import Pyro4
         daemon = Pyro4.Daemon()
-        sdbobj = A3SdbPyroIF()
-        sdb_uri = daemon.register(sdbobj)
+        xformobj = A3SdbPyroIF()
+        xform_uri = daemon.register(xformobj)
 
         ns = None
         for i in range(get_param('name:search_maxtries')):
@@ -29,16 +29,16 @@ def main():
 
         if ns:
             set_param('pyro-name-object', ns)
-            ns.register("sdb", sdb_uri)
-            logger().info('sdb is registered on a Pyro name server')
+            ns.register("xform", xform_uri)
+            logger().info('xform is registered on a Pyro name server')
             daemon.requestLoop()
             retval = 0
     except ImportError as e:
-        logger().warn('sdb is not registered on a Pyro name server')
+        logger().warn('xform is not registered on a Pyro name server')
         retval = -1
 
     # finalize web
-    sdb_finalize()
+    xform_finalize()
 
     return retval
 

@@ -3,7 +3,8 @@
 import os
 import argparse
 import logging
-import traceback
+import inspect
+import subprocess
 
 ACT3_HOME = '%s/..'%os.path.dirname(os.path.realpath(__file__))
 
@@ -69,6 +70,34 @@ class A3P_Exception(A3_Exception):
 #                     Logging                      #
 ####################################################
 
+class A3Logger(object):
+    def __init__(self, logger):
+        self.logger = logger
+
+    def log(self, func, msg, *args, **kwargs):
+        (frame, filename, line_number,
+         function_name, lines, index) = inspect.getouterframes(inspect.currentframe())[3]
+        path = '/'.join(os.path.abspath(filename).split('/')[-2:])
+        func('%s at %s(%d)'%(msg, path, line_number), *args, **kwargs)
+
+    def debug(self, msg, *args, **kwargs):
+        self.log(self.logger.debug, msg, *args, **kwargs)
+
+    def info(self, msg, *args, **kwargs):
+        self.log(self.logger.info, msg, *args, **kwargs)
+
+    def warn(self, msg, *args, **kwargs):
+        self.log(self.logger.warn, msg, *args, **kwargs)
+
+    def error(self, msg, *args, **kwargs):
+        self.log(self.logger.error, msg, *args, **kwargs)
+
+    def critical(self, msg, *args, **kwargs):
+        self.log(self.logger.critical, msg, *args, **kwargs)
+
+    def __getattr__(self, name):
+        return getattr(self.logger, name, self.dummy)
+
 def create_logger(svcname, filename, level):
     logger = logging.getLogger(svcname.upper())
     logger.setLevel(level)
@@ -90,7 +119,7 @@ def create_logger(svcname, filename, level):
     logger.addHandler(fh)
     logger.addHandler(ch)
 
-    return logger
+    return A3Logger(logger)
 
 ####################################################
 #                      Params                      #

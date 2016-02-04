@@ -131,9 +131,8 @@ def pyrocall(destname, funcname, *args, **kwargs):
             funcobj = getattr(destobj, funcname)
             return funcobj(*args, **kwargs)
         except Exception as e:
-            #tb = traceback.format_exc()
-            #pyrotb = "".join(Pyro4.util.getPyroTraceback())
-            #print('%s/\n*********** PYRO Exception ***********\n%s'%(tb, pyrotb))
+            logger().debug(traceback.format_exc())
+            logger().debug("".join(Pyro4.util.getPyroTraceback()))
             return {'error': True, 'msg': 'Call to Pyro function, %s.%s, is failed'%(destname, funcname)}
     else:
         return {'error': True, 'msg': 'Pyro object, %s, is None.'%destname}
