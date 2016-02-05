@@ -29,6 +29,7 @@ class A3Upload(object):
     def index(self, srcfile=None):
         retval = {'success': 'false', 'msg': []}
 
+        # if session does not exist, create one
         if 'id' not in cherrypy.session:
             cherrypy.session['id'] = generate_session()
 
@@ -40,10 +41,12 @@ class A3Upload(object):
         res = pyrocall('sdb', 'set_opt_stage', cherrypy.session['id'], A3WebSession.UPLOAD)
         if res['error']: retval['msg'].append(res['msg'])
 
+        # if uploaded file exists
         if srcfile:
             filename = srcfile[0]
             part = srcfile[1]
 
+            # create session directory
             session_home = get_param('web-session-dir')
             session_dir = '%s/%s'%(session_home, cherrypy.session['id'])
             if not os.path.exists(session_dir):
@@ -54,7 +57,7 @@ class A3Upload(object):
             with open(filepath, 'wb') as fd:
                 shutil.copyfileobj(part.file, fd)
 
-            # save information on svcdb
+            # save filepath on svcdb
             res = pyrocall('sdb', 'save_srcfile', cherrypy.session['id'], filepath)
             if res['error']: retval['msg'].append(res['msg'])
 

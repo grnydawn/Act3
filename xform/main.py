@@ -5,6 +5,7 @@ import time
 
 from a3xform_utils import xform_initialize, xform_finalize, get_param, set_param, logger
 from a3xform_pyro import A3SdbPyroIF
+from a3xform_ordermgr import A3OrderMgr
 
 def main():
 
@@ -12,6 +13,7 @@ def main():
 
     # initialize xform
     xform_initialize()
+    set_param('order-mgr', A3OrderMgr())
 
     # locate Pyro name server
     try:

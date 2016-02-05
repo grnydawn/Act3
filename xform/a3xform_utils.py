@@ -39,6 +39,7 @@ runtime_params = \
     'pyro-comp-object': None,
     'pyro-sdb-object': None,
     'logger': None,
+    'order-mgr': None,
 }
 
 # xform parameter database
@@ -60,6 +61,7 @@ def xform_initialize():
 
     if not os.path.exists(params['xform-dir']):
         os.makedirs(params['xform-dir'])
+
 
     logger.info('Started')
 

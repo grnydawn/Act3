@@ -24,6 +24,10 @@ for svc in "${svcs[@]}"; do
     fi
 done
 
+if [ $# > 0 -a "$1" == "all" ]; then
+	cmds=(${svcs[@]})
+fi
+
 # launch each services
 for cmd in "${cmds[@]}"; do
     if [ -f "${DIR}/../${cmd}/main.py" ]; then
