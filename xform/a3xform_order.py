@@ -8,3 +8,4 @@ class A3Order(object):
     def execute(self):
         # may add parallel execution
         return self._execute()
+

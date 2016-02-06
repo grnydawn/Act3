@@ -76,7 +76,7 @@ class A3Logger(object):
 
     def log(self, func, msg, *args, **kwargs):
         (frame, filename, line_number,
-         function_name, lines, index) = inspect.getouterframes(inspect.currentframe())[3]
+         function_name, lines, index) = inspect.getouterframes(inspect.currentframe())[2]
         path = '/'.join(os.path.abspath(filename).split('/')[-2:])
         func('%s at %s(%d)'%(msg, path, line_number), *args, **kwargs)
 

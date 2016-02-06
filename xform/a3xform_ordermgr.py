@@ -9,9 +9,9 @@ from filecheck import FileCheckOrder
 
 class A3OrderMgr(object):
 
-    def make_order(self, action, *args, **kwargs):
-        if action=='filecheck':
+    def make_order(self, order_title, *args, **kwargs):
+        if order_title=='filecheck':
             return FileCheckOrder(*args, **kwargs)
         else:
-            raise Exception('%s action is not supported.')
+            raise Exception('%s order is not supported.'%order_title)
 

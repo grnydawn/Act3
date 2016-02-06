@@ -21,3 +21,5 @@ class FileCheckOrder(A3Order):
     def _execute(self):
         return { 'filetype': 'TBD' }
 
+    def __str__(self):
+        return 'Filecheck order'
