@@ -1,0 +1,20 @@
+1. classfication tree
+- split a large order into smaller order
+- a leaf order is configured with stochastic parameters that can be optimized through machine learning
+- each branches from upper node to lower nodes requires decision-making information to decied which branch will be chosen. The information is provided from analysis part.
+
+2. Analysis part
+- analysis part generates information required for decision making of branch seletions and/or a leaf node execution
+- The list of information can be automatically collected from classfication tree
+- analysis can be executed through probing tasks 
+
+3. optimizations
+- mutiple leaf order may be executed in parallel to remove dependancy between them
+- once a leaf order wins against other leaf nodes, it will combines other optimizations through combinatorial merge.
+- This optimizaion repeats from the start of analysis to optimize further, 
+
+
+4. knowledge accumulation
+- how to generate better classification
+- how to improve all the decision ...
+- how to match input information to leaf order to optimized distribution of parameters of the leaf node
