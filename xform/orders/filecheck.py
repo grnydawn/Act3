@@ -7,6 +7,7 @@ class FileCheckOrder(A3Order):
         self.filepath = filepath
         logger().info('filecheck order is made with %s'%filepath)
 
+        # how to choose task
         # define a chain of stages
         # preprocesses
         # reader
