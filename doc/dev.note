@@ -18,3 +18,12 @@
 - how to generate better classification
 - how to improve all the decision ...
 - how to match input information to leaf order to optimized distribution of parameters of the leaf node
+
+
+causal relation ship notes
+1. Inductive reasoning provides us with a way to think without logical error
+2. However, inductive reasoning can only reason about what we already know
+3. Deductive reasoning can reason about cause of outcome, which enables us to enlarge our knowledge base
+4. However deductive reasoning is based on a causal relationship model which is essentially not perfect model
+5. Now, the qestion is how we can update model in corrrect direction if we have input-output data
+6. All-to-all relationship??? Everything is connected?
