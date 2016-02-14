@@ -175,6 +175,19 @@
 			});
 		};
 
+		function subscribe() {
+			var username = document.getElementById("username_input");
+			var password = document.getElementById("password_input");
+			var username_text = username.value
+			var password_text = password.value
+			$.post('subscribe', { username: username_text, password : password_text}, 
+				function(returnedData){
+					 console.log(returnedData);
+					//window.location.href = "#firstPage";
+					 //alert(returnedData)
+			});
+		};
+
     </script>
 </head>
 
@@ -188,7 +201,6 @@
 </ul>
 
 <div id="fullpage">
-
     <div class="section active" id="section0">
         <h1>Automatic Performance Optimizer</h1>
         <h2>Maximize speed of your program with a few clicks away!</h2>
@@ -256,7 +268,10 @@
         <div class="intro">
             <h1>Subscribe</h1>
             <h2>With subscription, you can unlatch all the limitations of guest service.</h2>
-			<a href="#section2"><img src="/static/img/btn_disabled_subscribe.png" alt="act3" id="btn_subscribe" onClock="alert('Under development')" /></a>
+				username:&nbsp;<input type='text' id='username_input' width="200px"><br><br>
+				password:&nbsp;<input type='password' id='password_input' width="200px"><br><br>
+
+			<a href=""><img src="/static/img/btn_subscribe.png" alt="act3" id="btn_subscribe" onClick="subscribe()" /></a>
         </div>
     </div>
     <div class="section" id="section3">

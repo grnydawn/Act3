@@ -122,6 +122,7 @@ def pyrocall(destname, funcname, *args, **kwargs):
         try:
             destobj = Pyro4.Proxy('PYRONAME:%s'%destname)
         except:
+            print('PPPPP;', destname)
             return {'error': True, 'msg': 'Can not get %s Pyro object'%destname}
         if destobj:
             runtime_params['pyro-%s-object'%destname] = destobj
