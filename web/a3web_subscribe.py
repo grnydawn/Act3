@@ -34,7 +34,6 @@ class A3Subscribe(object):
             res = pyrocall('sdb', 'create_opt_session', cherrypy.session['id'])
             if res['error']: retval['msg'].append(res['msg'])
 
-        print('XXXX', username, password)
         if username and password:
             res = pyrocall('udb', 'subscribe', cherrypy.session['id'], username, password)
             if res['error']: retval['msg'].append(res['msg'])

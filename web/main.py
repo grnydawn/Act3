@@ -26,7 +26,7 @@ def main():
 
             from a3web_subscribe import A3Subscribe
             subscribe = A3Subscribe()
-            cherrypy.tree.mount(upload, '/subscribe', subscribe.conf)            
+            cherrypy.tree.mount(subscribe, '/subscribe', subscribe.conf)            
 
             cherrypy.engine.start()
             logger().info('Act3 Web server is started')
