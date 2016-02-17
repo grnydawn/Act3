@@ -1,6 +1,8 @@
 # a3_utils.py
 
 import os
+import sys
+import uuid
 import argparse
 import logging
 import inspect
@@ -189,6 +191,10 @@ def _set_param(ppath, pvalue, params):
 #                       Pyro                       #
 ####################################################
 
+def packfile4pyro(filename, fileobj):
+    # generate fileblob
+    return filename
+
 ####################################################
 #                      Shell                       #
 ####################################################
@@ -196,3 +202,15 @@ def runcmd(cmd, input=None):
     proc = subprocess.Popen(cmd, stdin=subprocess.PIPE, \
         stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     return proc.communicate(input=input)
+
+####################################################
+#                       UUID                       #
+####################################################
+
+def hex_uuid():
+    return uuid.uuid4().hex
+
+####################################################
+#                       MISC                       #
+####################################################
+

@@ -11,7 +11,8 @@ A3_HOME = '%s/..'%SCRIPT_DIR
 A3_COMMON = '%s/common'%A3_HOME
 sys.path.insert(0, A3_COMMON)
 
-from a3_utils import common_params, setup_params, create_logger, _get_param
+from a3_utils import common_params, setup_params, create_logger, _get_param, hex_uuid, \
+    packfile4pyro
 
 # session stage
 class A3WebSession(object):
@@ -107,10 +108,10 @@ def get_user_param_desc(pname):
 def logger():
     return web_globals['runtime_params']['logger']
 
-def generate_session():
-    return 'A3'+'%030x' % random.randrange(16**30)
+def get_uuid():
+    return hex_uuid()
 
-def pyrocall(destname, funcname, *args, **kwargs):
+def remotecall(destname, funcname, *args, **kwargs):
 
     try:
         import Pyro4
@@ -137,3 +138,6 @@ def pyrocall(destname, funcname, *args, **kwargs):
             return {'error': True, 'msg': 'Call to Pyro function, %s.%s, is failed'%(destname, funcname)}
     else:
         return {'error': True, 'msg': 'Pyro object, %s, is None.'%destname}
+
+def file2blob(filename, fileobj):
+    return packfile4pyro(filename, fileobj)
