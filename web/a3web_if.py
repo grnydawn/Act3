@@ -2,7 +2,7 @@
 
 from a3web_utils import remotecall
 
-class WebIF(object):
+class WebOutIF(object):
 
     # interface to sdb
     @staticmethod

@@ -63,6 +63,38 @@ def sdb_initialize():
 
     logger.info('Started')
 
+
+def sdb_start(tables):
+
+    # register service db object
+    for tname, tobj in tables:
+        set_param('%s-obj'%tname, tobj, params='r')
+
+    # locate Pyro name server
+    try:
+        import Pyro4
+        import a3sdb_pyro import A3SdbPyroIF
+        daemon = Pyro4.Daemon()
+        sdbobj = A3SdbPyroIF()
+        sdb_uri = daemon.register(sdbobj)
+
+        ns = None
+        for i in range(get_param('name:search_maxtries')):
+            try: ns = Pyro4.locateNS()
+            except: pass
+            if ns: break
+            time.sleep(get_param('name:search_interval'))
+
+        if ns:
+            set_param('pyro-name-object', ns)
+            ns.register("sdb", sdb_uri)
+            logger().info('sdb is registered on a Pyro name server')
+            daemon.requestLoop()
+            retval = 0
+    except ImportError as e:
+        logger().warn('sdb is not registered on a Pyro name server')
+        retval = -1
+
 def sdb_finalize():
     logger().info('Finished')
 

@@ -3,8 +3,8 @@
 import sys
 import time
 
-from a3sdb_utils import sdb_initialize, sdb_finalize, get_param, set_param, logger
-from a3sdb_pyro import A3SdbPyroIF
+from a3sdb_utils import sdb_initialize, sdb_finalize, sdb_start
+from a3sdb_mgr import A3ServiceDBManager
 
 def main():
 
@@ -13,29 +13,14 @@ def main():
     # initialize sdb
     sdb_initialize()
 
-    # locate Pyro name server
-    try:
-        import Pyro4
-        daemon = Pyro4.Daemon()
-        sdbobj = A3SdbPyroIF()
-        sdb_uri = daemon.register(sdbobj)
+    # create service tables
+    filecheck = A3ServiceDBManager.createServiceDB('filecheck')
 
-        ns = None
-        for i in range(get_param('name:search_maxtries')):
-            try: ns = Pyro4.locateNS()
-            except: pass
-            if ns: break
-            time.sleep(get_param('name:search_interval'))
+    tables = []
+    tables.append(( 'filecheck', filecheck ))
 
-        if ns:
-            set_param('pyro-name-object', ns)
-            ns.register("sdb", sdb_uri)
-            logger().info('sdb is registered on a Pyro name server')
-            daemon.requestLoop()
-            retval = 0
-    except ImportError as e:
-        logger().warn('sdb is not registered on a Pyro name server')
-        retval = -1
+    # start sdb
+    sdb_start(tables)
 
     # finalize web
     sdb_finalize()

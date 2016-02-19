@@ -43,6 +43,7 @@ runtime_params = \
     'pyro-comp-object': None,
     'pyro-xform-object': None,
     'logger': None,
+    'userdb-obj': None
 }
 
 # udb parameter database
@@ -66,6 +67,36 @@ def udb_initialize():
         os.makedirs(params['udb-dir'])
 
     logger.info('Started')
+
+def udb_start(userdb):
+
+    # register user db object
+    set_param('userdb-obj', userdb, params='r'):
+
+    # locate Pyro name server
+    try:
+        import Pyro4
+        from a3udb_pyro import Pyro4
+        daemon = Pyro4.Daemon()
+        udbobj = A3UdbPyroIF()
+        udb_uri = daemon.register(udbobj)
+
+        ns = None
+        for i in range(get_param('name:search_maxtries')):
+            try: ns = Pyro4.locateNS()
+            except: pass
+            if ns: break
+            time.sleep(get_param('name:search_interval'))
+
+        if ns:
+            set_param('pyro-name-object', ns)
+            ns.register("udb", udb_uri)
+            logger().info('udb is registered on a Pyro name server')
+            daemon.requestLoop()
+            retval = 0
+    except ImportError as e:
+        logger().warn('udb is not registered on a Pyro name server')
+        retval = -1
 
 def udb_finalize():
     logger().info('Finished')
