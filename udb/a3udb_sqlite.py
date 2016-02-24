@@ -1,23 +1,26 @@
 '''Act 3 User Sqlite DB'''
 
+import os
+import sqlite3
+
+from a3udb_base import A3UserDB
+from a3udb_utils import get_param
+
+DB_TYPE_SQLITE = 'SQLite'
+
 class A3UserDB_SQLite(A3UserDB):
-    USER_DB_FILE_NAME = os.path.join(ACT3_DATA, 'user.db')
+    USER_DB_FILE_NAME = os.path.join(get_param('udb-dir'), 'user.db')
 
     def __init__(self):
-        if use_python_3():
-            super.__init__('SQLite')
-        else:
-            super(A3UserDB_SQLite, self).__init__('SQLite')
-
+        super(A3UserDB_SQLite, self).__init__('SQLite')
+        #super.__init__('SQLite')
         self.initialize()
 
     def __del__(self):
         #self.cursor.close()
         self.conn.close()
-        if use_python_3():
-            super.__del__('SQLite')
-        else:
-            super(A3UserDB_SQLite, self).__del__()
+        super.__del__('SQLite')
+        #super(A3UserDB_SQLite, self).__del__()
 
     def addUser(self, username, password, email, phone=None):
         sql_string = A3UserDB.SQL_CHECK_USER

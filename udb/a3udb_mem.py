@@ -1,11 +1,13 @@
 '''Act 3 User Memory DB'''
 
+from a3udb_base import A3UserDB
+
+DB_TYPE_MEMORY = 'memory'
+
 class A3UserDB_Memory(A3UserDB):
     def __init__(self):
-        if use_python_3():
-            super.__init__('Memory')
-        else:
-            super(A3UserDB_Memory, self).__init__('Memory')
+        #super.__init__('Memory')
+        super(A3UserDB_Memory, self).__init__('Memory')
         self.list = {}
 
     #def __del__(self):

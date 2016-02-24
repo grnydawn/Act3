@@ -5,11 +5,12 @@ import os
 import logging
 import base64
 
-SCRIPT_DIR, SCRIPT_NAME = os.path.split(os.path.realpath(__file__))
-A3_HOME = '%s/..'%SCRIPT_DIR
-A3_COMMON = '%s/common'%A3_HOME
+SCRIPT_DIR, SCRIPT_NAME = os.path.split(__file__)
+A3_HOME = os.path.join(SCRIPT_DIR,'..')
+A3_COMMON = os.path.join(A3_HOME, 'common')
 sys.path.insert(0, A3_COMMON)
 
+from a3_utils import ACT3_HOME
 from a3_utils import common_params, setup_params, create_logger, _get_param, _set_param
 
 # session stage
@@ -52,11 +53,20 @@ udb_globals['user_params_desc'] = user_params_desc
 udb_globals['runtime_params'] = runtime_params
 
 def udb_initialize():
-
+    from a3udb_mgr import A3UserDBMgr
+    
     params = setup_params('udb', udb_globals['user_params_desc'])
     udb_globals['user_params'] = params
 
-    logger = create_logger('udb', '%s/%s'%(common_params['host']['shared'], \
+    shared_dir = common_params['host']['shared']
+    if not os.path.exists(shared_dir):
+        #env_keys = os.environ.keys()
+        if 'ACT3_SHARED' in os.environ.keys():
+            shared_dir = os.environ['ACT3_SHARED']
+        if not os.path.exists(shared_dir):
+            shared_dir = os.path.join(ACT3_HOME, 'shared')
+        common_params['host']['shared'] = shared_dir
+    logger = create_logger('udb', '%s/%s'%(shared_dir, \
         params['log-filename']), udb_globals['user_params_desc']['log-level'][2][params['log-level']])
     udb_globals['runtime_params']['logger'] = logger
 
@@ -65,6 +75,8 @@ def udb_initialize():
     if not os.path.exists(params['udb-dir']):
         os.makedirs(params['udb-dir'])
 
+    user_db = A3UserDBMgr.createUserDB()
+    udb_globals['user_db'] = user_db
     logger.info('Started')
 
 def udb_finalize():

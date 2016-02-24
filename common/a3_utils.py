@@ -1,12 +1,13 @@
 # a3_utils.py
 
 import os
+import json
 import argparse
 import logging
 import inspect
 import subprocess
 
-ACT3_HOME = '%s/..'%os.path.dirname(os.path.realpath(__file__))
+ACT3_HOME = os.path.realpath(os.path.join(os.path.dirname(__file__), '..'))
 
 ####################################################
 #                  ACT3 Components                 #
@@ -192,7 +193,8 @@ def _set_param(ppath, pvalue, params):
 ####################################################
 #                      Shell                       #
 ####################################################
-def runcmd(cmd, input=None):
+def runcmd(cmd, input_=None):
     proc = subprocess.Popen(cmd, stdin=subprocess.PIPE, \
         stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-    return proc.communicate(input=input)
+    return proc.communicate(input=input_)
+

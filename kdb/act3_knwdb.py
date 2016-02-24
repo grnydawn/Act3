@@ -10,10 +10,10 @@ sys.path.insert(0, COMMON_DIR)
 
 class A3KnwDB(object):
     def __init__(self):
-        print 'KNWDB: CONNECTED'
+        print ('KNWDB: CONNECTED')
 
     def __del__(self):
-        print 'KNWDB: CLOSED'
+        print ('KNWDB: CLOSED')
 
 knwdb = A3KnwDB()
 

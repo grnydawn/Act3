@@ -1,5 +1,9 @@
 '''Act 3 User DB Base class'''
 
+from abc import ABCMeta, abstractmethod
+
+OPT_SQLITE = True
+
 class A3UserDB(object):
     __metaclass__ = ABCMeta
 
@@ -21,6 +25,7 @@ class A3UserDB(object):
     SQL_SELECT_ALL_USERS = "SELECT * FROM %s;" % USER_TABLE_NAME
 
     def __init__(self, db_type=''):
+        super(A3UserDB, self).__init__()
         self.db_type = db_type
         self.user_tbl_name = A3UserDB.USER_TABLE_NAME
         print ('USERDB: CONNECTED %s' % db_type)
